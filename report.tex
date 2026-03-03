@@ -1,0 +1,1098 @@
+\documentclass[journal,12pt,onecolumn,draftclsnofoot]{IEEEtran}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{bm}
+\usepackage{subcaption}
+% --- NEW PACKAGES FOR PAGE NUMBERING ---
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+
+% Standard thesis formatting: 1.5 line spacing to drastically increase page count and readability
+\linespread{1.5}
+\geometry{a4paper, margin=1in}
+
+% --- NEW CONFIGURATION FOR FOOTER ---
+\pagestyle{fancy}
+\fancyhf{} % Clear all default headers and footers
+\renewcommand{\headrulewidth}{0pt} % Remove header line
+\fancyfoot[C]{\thepage\ of \pageref{LastPage}} % Centered footer: Page X of Y
+
+% Ensure the title page (which defaults to 'plain' style) also gets the footer
+\fancypagestyle{plain}{
+    \fancyhf{}
+    \renewcommand{\headrulewidth}{0pt}
+    \fancyfoot[C]{\thepage\ of \pageref{LastPage}}
+}
+
+\hypersetup{
+    colorlinks=true, % Use colored links
+    linkcolor=black, % Color of internal links
+    urlcolor=blue,   % Color of external links
+    citecolor=green,  % Color of citation links
+    linktoc=all,     %set to all if you want both sections and subsections linked
+}
+
+% --- NEW CONFIGURATION FOR SECTION & TABLE NUMBERING ---
+% 1. Change the underlying counters to Arabic
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+\renewcommand{\thetable}{\arabic{table}}
+
+% 2. Force IEEEtran to actually print those Arabic counters in the headings
+\makeatletter
+\renewcommand{\thesectiondis}{\thesection.\quad}
+\renewcommand{\thesubsectiondis}{\thesubsection.\quad}
+\renewcommand{\thesubsubsectiondis}{\thesubsubsection.\quad}
+\makeatother
+
+\begin{document}
+
+\begin{figure}[htbp]
+    \centering
+    \begin{subfigure}[b]{0.30\textwidth}
+        \centering
+        \IfFileExists{Alexandria_university.png}{%
+            \includegraphics[height=3cm]{Alexandria_university.png}%
+        }{%
+            \framebox[3cm]{\rule{0pt}{3cm} AU Logo}%
+        }
+    \end{subfigure}%
+    \hspace{2cm} % Space between logos
+    \begin{subfigure}[b]{0.30\textwidth}
+        \centering
+        \IfFileExists{faculty_of_engineering.jpeg}{%
+            \includegraphics[height=3cm]{faculty_of_engineering.jpeg}%
+        }{%
+            \framebox[3cm]{\rule{0pt}{3cm} Faculty Logo}%
+        }
+    \end{subfigure}
+    
+    \vspace{0.5cm}
+    \par\noindent % Safely forces a new line to push the rule below the images
+    \rule{\textwidth}{0.4pt}
+\end{figure}
+
+\begin{center}
+Faculty of Engineering\\
+    Department of Computer and Systems Engineering
+\end{center}
+
+\vspace{1cm} % Add some breathing room before the title
+
+\begin{center}
+    {\Large \textbf{Reference-Guided Few-Shot Segmentation with Foundation Models}} \\ 
+    \vspace{0.5cm}
+    {\large \textbf{PhD Main Specialization Exam Submission}}
+\end{center}
+
+\vspace{1cm}
+
+\begin{center}
+    Presented by\\
+    \vspace{0.5cm}
+    {\large \textbf{Omar Ahmed Fouad Hassan Wasfy}}\\
+\end{center}
+
+\vspace{1cm}
+
+\begin{center}
+    {\small \textbf{B.Sc. in Computer and Systems Engineering  \\
+    Faculty of Engineering, Alexandria University, 2019}}
+    
+    \vspace{0.5cm}
+    
+    {\small \textbf{M.Sc. in Computer and Systems Engineering  \\
+    Faculty of Engineering, Alexandria University, 2024}}
+\end{center}
+
+\vspace{1cm}
+
+\begin{center}
+    \textbf{Supervisors:} Prof. Dr. Mohamed Ismail and Prof. Dr. Nagia Ghanem
+\end{center}
+
+\vfill % Pushes the date to the bottom of the page
+
+\begin{center}
+    2026
+\end{center}
+
+\normalsize
+
+\newpage
+
+\begin{abstract}
+Reference-guided few-shot segmentation with foundation models extends conditional dense prediction to open-set, class-agnostic environments. This task requires the accurate pixel-level delineation of a target object within a query image, guided strictly by a limited set of annotated reference examples. The emergence of large-scale foundation vision models, particularly the Segment Anything Model (SAM), provides robust zero-shot visual priors learned from billions of masks. However, adapting these generic priors for specific, reference-guided semantic tasks remains a critical challenge due to the semantic-geometric gap. This comprehensive doctoral report presents an extended, mathematically rigorous synthesis of contemporary methodologies addressing this adaptation bottleneck. The study categorizes recent advancements into a precise methodological taxonomy: prompt-based adaptation (VRP-SAM), probabilistic prompting (ProSAM), feature matching (Matcher), consistency-based adaptation (DC-SAM), graph-based reasoning (Bridge-the-Points), and prototype-based modeling (FCP-SAM). Through a rigorous comparative analysis on extensive FSS benchmarks (including COCO-20i, PASCAL-5i, FSS-1000, LVIS-92i, PASCAL-Part, and PACO-Part), this report evaluates the architectural designs, cross-attention mechanisms, loss formulations, computational trade-offs, and failure modes of these paradigms. The findings establish a foundational framework for understanding the trajectory of few-shot image segmentation using foundation vision models and identify critical gaps for future algorithmic development, particularly concerning multi-shot degradation, latent space optimization, and distractor suppression in densely cluttered multi-instance scenes.
+\end{abstract}
+
+\newpage
+\tableofcontents
+\newpage
+
+\listoffigures
+\vspace{2em}
+\listoftables
+\vspace{2em}
+
+\section*{List of Abbreviations}
+\addcontentsline{toc}{section}{List of Abbreviations}
+\begin{IEEEdescription}[\IEEEsetlabelwidth{PASCAL-Part}]
+    \item[BCE] Binary Cross-Entropy
+    \item[CNN] Convolutional Neural Network
+    \item[COCO-20i] Common Objects in Context (Few-Shot Split)
+    \item[CV] Computer Vision
+    \item[ELBO] Evidence Lower Bound
+    \item[EMD] Earth Mover's Distance
+    \item[FCN] Fully Convolutional Network
+    \item[FPS] Frames Per Second
+    \item[FSS] Few-Shot Segmentation
+    \item[GFLOPs] Giga Floating Point Operations
+    \item[KL] Kullback-Leibler (Divergence)
+    \item[LVIS] Large Vocabulary Instance Segmentation
+    \item[MAE] Masked Autoencoder
+    \item[mIoU] Mean Intersection over Union
+    \item[NLP] Natural Language Processing
+    \item[PACO] Parts and Attributes of Common Objects
+    \item[PASCAL-5i] PASCAL Visual Object Classes (Few-Shot Split)
+    \item[PEFT] Parameter-Efficient Fine-Tuning
+    \item[PMC] Point-Mask Clustering
+    \item[PNA] Positive-Negative Alignment
+    \item[SAM] Segment Anything Model
+    \item[ViT] Vision Transformer
+    \item[VRP] Visual Reference Prompt
+\end{IEEEdescription}
+\newpage
+
+% ==========================================
+% CHAPTER 1: INTRODUCTION
+% ==========================================
+\section{Introduction}
+
+\subsection{Background and Motivation}
+Semantic segmentation, the computational process of assigning a categorical class label to every individual pixel within an image, is a cornerstone of modern computer vision. Traditionally, achieving state-of-the-art performance in this domain relies on supervised learning paradigms that require massive, densely annotated datasets. Architectures such as Fully Convolutional Networks (FCNs) and the DeepLab series optimize millions of parameters to recognize a fixed, predefined set of categories. 
+
+However, this closed-set paradigm exhibits catastrophic performance degradation when tasked with segmenting objects outside its original training distribution. The rigidity of standard semantic segmentation lacks the flexibility required for dynamic, real-world applications—such as medical imaging analysis, autonomous navigation, and industrial robotics—where novel object categories emerge continuously. Furthermore, the acquisition of exhaustive pixel-level annotations for every new category is prohibitively expensive, time-consuming, and prone to human error.
+
+Few-shot segmentation (FSS) directly addresses this fundamental limitation. By drawing inspiration from human cognitive capabilities, FSS aims to adapt neural networks to unseen, novel classes using only a minimal support set of annotated examples—typically ranging from 1 to 5 images. The recent integration of vision foundation models, trained on unprecedented scales of unannotated or semi-annotated data, introduces powerful zero-shot generalization capabilities. Adapting these foundation models for few-shot tasks represents a massive paradigm shift in computer vision: moving away from training specialized architectures from scratch, toward engineering efficient, lightweight mechanisms to condition frozen, billion-parameter networks.
+
+\subsection{Problem Statement}
+Reference-guided few-shot segmentation specifically aims to produce an accurate pixel-level delineation of a target object in a query image given only a small support set of annotated reference images. The core problem is structural and mathematical: how to map the semantic intent of the reference annotations into a latent format mathematically compatible with the foundation model's input prompt space. The primary objective is achieving precise semantic alignment across images characterized by severe appearance variability, without inducing catastrophic forgetting of the foundation model's heavily optimized, pre-trained geometric priors.
+
+\subsection{Research Scope and Objectives}
+This doctoral report systematically evaluates the methodological progression of conditioning mechanisms for the Segment Anything Model (SAM) in few-shot scenarios. The primary objectives are to:
+\begin{enumerate}
+    \item Analyze state-of-the-art adaptation techniques, tracing the evolution from basic prompt engineering and feature aggregation to complex probabilistic spaces, prototype matching, and topological graph-based architectures.
+    \item Dissect the mathematical formulations and architectural implementations of these models, specifically evaluating their feature extraction pipelines, cross-attention mechanisms, and custom loss functions.
+    \item Compare empirical performance across standard FSS benchmarks (COCO-20i, PASCAL-5i), large-vocabulary benchmarks (FSS-1000, LVIS-92i), and fine-grained part-segmentation datasets (PASCAL-Part, PACO-Part).
+    \item Define the theoretical and practical limits of current approaches regarding computational complexity, inference latency, memory footprint, and multi-shot scaling capabilities.
+\end{enumerate}
+
+\subsection{Contributions of the Study}
+The primary contributions of this synthesis are:
+\begin{itemize}
+    \item The establishment of a formalized, six-tier methodological taxonomy for SAM adaptation techniques, categorizing the current literature based on their foundational approach to the semantic-geometric gap.
+    \item A detailed algorithmic deconstruction of six foundational methodologies, highlighting their mathematical novelties, specifically regarding positive-negative alignment and variational inference.
+    \item A critical synthesis of empirical results across 6 distinct datasets, explicitly correlating mIoU performance with dataset complexity in 1-shot and 5-shot configurations.
+    \item The identification of systemic failure modes related to scale variation, prompt sensitivity, and dense multi-instance clutter, paving the way for future algorithmic interventions.
+\end{itemize}
+
+\newpage
+
+% ==========================================
+% CHAPTER 2: BACKGROUND AND RELATED WORK
+% ==========================================
+\section{Background and Related Work}
+
+\subsection{Evolution of Semantic Segmentation}
+Early approaches to semantic segmentation relied heavily on Fully Convolutional Networks (FCNs), which replaced the dense, fully connected layers of classification networks with convolutional layers to output spatial maps. The introduction of residual connections via ResNet allowed for much deeper architectures, mitigating the vanishing gradient problem and vastly improving spatial feature extraction capabilities. Subsequent architectures like DeepLabv3 integrated Atrous Spatial Pyramid Pooling (ASPP) to capture multi-scale context. However, these models were strictly bounded by the closed-set nature of their training data (e.g., PASCAL VOC, MS COCO). They lacked the structural capacity to generalize to novel, out-of-distribution classes without extensive retraining or fine-tuning, severely limiting their real-world scalability.
+
+\subsection{Few-Shot Segmentation via Metric Learning}
+To overcome the limitations of closed-set classifiers, early Few-Shot Segmentation (FSS) approaches utilized metric learning and episodic training paradigms, heavily inspired by Prototypical Networks originally designed for few-shot image classification. These models, such as PANet \cite{wang2019panet} and PFENet \cite{tian2020pfenet}, functioned by projecting both support and query images into a shared, highly optimized latent space. They subsequently computed pixel-wise cosine similarities between the query features and a generated "class prototype" extracted from the support mask. 
+
+While highly effective on standard, moderately complex benchmarks, these early metric-learning models exhibited several critical flaws:
+\begin{enumerate}
+    \item They often overfitted to the base classes seen during the episodic training domains.
+    \item The episodic training itself, required to simulate few-shot scenarios during the training phase, was computationally expensive and memory-intensive.
+    \item They struggled with strict open-set generalization when encountering radically novel classes or extreme domain shifts (e.g., medical or satellite imagery).
+\end{enumerate}
+
+\subsection{Vision Foundation Models and Self-Supervision}
+The landscape of computer vision shifted dramatically with the introduction of foundation models. These models leverage self-supervised or contrastive learning (e.g., Masked Autoencoders) over millions, or even billions, of unannotated images to produce highly robust, generalized feature embeddings. 
+
+The Vision Transformer (ViT) revolutionized this space by discarding convolutions entirely. By treating image patches as linear sequences, ViTs allow multi-head self-attention mechanisms to capture long-range global context across the entire image, a feat previously inaccessible to localized CNN receptive fields.
+
+Further advancements like DINOv2 demonstrated that self-supervised learning on curated, large-scale datasets could produce features with dense, part-level semantic understanding without any manual bounding-box or mask annotations. These models serve as universal feature extractors, forming the foundational backbone of modern perception systems and rendering training-from-scratch obsolete for most downstream tasks.
+
+\subsection{Prompt Learning and Visual Conditioning}
+Prompt learning, initially popularized in Large Language Models (LLMs) like GPT within Natural Language Processing (NLP), has transitioned successfully to computer vision. Visual prompting involves appending learnable parameters (tokens) to the input image patches or intermediate feature maps. This technique allows for task-specific adaptation while keeping the massive backbone weights (often comprising hundreds of millions of parameters) strictly frozen. This approach preserves the foundation model's generalized representation capacity and crucially minimizes the risk of overfitting during the few-shot adaptation phase, where training data is extremely scarce.
+
+\newpage
+
+% ==========================================
+% CHAPTER 3: PROBLEM FORMULATION
+% ==========================================
+\section{Problem Formulation}
+
+\subsection{Task Definition and Episodic Paradigm}
+Reference-guided few-shot segmentation with foundation models is a conditional dense prediction task. It aims to produce an accurate pixel-level delineation of a target object in a query image using only a small set of annotated reference examples. Each reference example consists of an image paired with a segmentation mask specifying the object of interest. This reference set functions as an explicit task descriptor at inference time, enabling the model to segment the same object in previously unseen images without retraining or relying on predefined category labels.
+
+Unlike conventional semantic segmentation, which assumes a fixed set of classes learned during training, this paradigm operates in an open-set and class-agnostic setting. The system must generalize to novel object categories and domains based solely on the visual information contained in the reference examples. This flexibility is essential for real-world scenarios where exhaustive annotation of all possible object categories is infeasible.
+
+The task operates under the standard $N$-way $K$-shot episodic formulation. The support set $S = \{(I_{s,i}, M_{s,i})\}_{i=1}^K$ consists of $K$ reference images and their corresponding ground-truth binary masks for a specific target class $c$. The episodic training paradigm mimics the inference environment, assuming access to a massive training dataset $\mathcal{D}_{train}$ containing base classes $\mathcal{C}_{base}$. The model is subsequently evaluated on a disjoint testing dataset $\mathcal{D}_{test}$ containing strictly novel classes $\mathcal{C}_{novel}$, ensuring that $\mathcal{C}_{base} \cap \mathcal{C}_{novel} = \emptyset$.
+
+\subsection{Mathematical Input and Output Representation}
+The system receives two complementary components that define the task. First, the \textbf{Support Set} provides the semantic and visual definition of the target. These high-resolution RGB images are normalized and resized to accommodate the foundation model's Vision Transformer backbone:
+\begin{equation}
+    I_s, I_q \in \mathbb{R}^{H \times W \times 3}
+\end{equation}
+The binary support masks denote the precise spatial location of the foreground target object:
+\begin{equation}
+    M_s \in \{0, 1\}^{H \times W}
+\end{equation}
+This support set acts as an explicit spatial attention mechanism. It typically contains one to five examples, representing an object instance or a semantic concept, and can exhibit variability in viewpoint, scale, appearance, and background.
+
+Second, the \textbf{Query Image} ($I_q$) is an unlabeled image where the model must identify the object defined by the support set. Query images may contain multiple objects, complex scenes, and conditions differing from the references.
+
+The final output is a predicted dense probability map:
+\begin{equation}
+    \hat{M}_q \in [0, 1]^{H \times W}
+\end{equation}
+An effective prediction precisely delineates object boundaries, corresponds strictly to the reference object, excludes visually similar distractors, and remains robust to contextual variations. This probability map is subsequently thresholded (standardized at $\tau = 0.5$) to yield the discrete binary mask.
+
+\subsection{Standard Loss Formulations}
+Because the target objects in few-shot tasks often occupy a very small percentage of the total image area, models face severe class imbalance. During the meta-training of the auxiliary conditioning modules, models typically optimize a combination of Binary Cross-Entropy (BCE) Loss and Dice Loss:
+\begin{equation}
+    \mathcal{L}_{BCE} = -\frac{1}{N} \sum_{i=1}^N \left[ y_i \log(\hat{y}_i) + (1 - y_i) \log(1 - \hat{y}_i) \right]
+\end{equation}
+\begin{equation}
+    \mathcal{L}_{Dice} = 1 - \frac{2 \sum_{i=1}^N y_i \hat{y}_i}{\sum_{i=1}^N y_i + \sum_{i=1}^N \hat{y}_i}
+\end{equation}
+The total loss is a weighted sum:
+\begin{equation}
+    \mathcal{L}_{total} = \mathcal{L}_{BCE}(\hat{M}_q, M_q) + \lambda \mathcal{L}_{Dice}(\hat{M}_q, M_q)
+\end{equation}
+where $\lambda$ is a balancing hyperparameter ensuring that small structural details are captured while maintaining overall pixel-wise accuracy.
+
+\subsection{Core Technical Challenges}
+Adapting generic foundation models to the strict parameters of FSS introduces several critical computational and mathematical bottlenecks:
+\begin{itemize}
+    \item \textbf{Cross-Image Correspondence:} Establishing reliable associations between reference and query regions despite differences in viewpoint, pose, illumination, and background context.
+    \item \textbf{Appearance Variability:} Handling significant intra-class variation, scale changes, deformation, and partial occlusion between reference and target instances.
+    \item \textbf{Distractor Suppression:} Distinguishing the target object from visually similar objects and densely cluttered environments.
+    \item \textbf{Prompt Sensitivity:} Ensuring stable performance when reference annotations are sparse, imperfect, or when suboptimal prompts are generated by automated systems.
+    \item \textbf{Adaptation Without Overfitting:} Specializing the foundation model to the reference object while maintaining its broad zero-shot geometric priors.
+    \item \textbf{Computational Efficiency:} Achieving adaptation at inference time without expensive retraining.
+\end{itemize}
+
+\newpage
+
+% ==========================================
+% CHAPTER 4: APPLICATIONS
+% ==========================================
+\section{Applications}
+
+Reference-guided few-shot segmentation enables adaptive perception in scenarios where labeled data is scarce or object categories are dynamic. Key applications include:
+\begin{itemize}
+    \item \textbf{Video Object Segmentation:} Segmenting a specific object across frames using a few annotated references.
+    \item \textbf{Medical Image Analysis:} Segmenting rare anatomical structures or pathological regions using limited annotated cases.
+    \item \textbf{Robotics and Autonomous Manipulation:} Allowing robots to recognize and interact with previously unseen objects specified through demonstrations.
+    \item \textbf{Autonomous Driving and Intelligent Transportation:} Segmenting unexpected road hazards or rare obstacles using a few reference examples.
+    \item \textbf{Image Editing and Content Creation:} Extracting objects specified by example images for compositing and generative workflows.
+    \item \textbf{Visual Search and Retrieval:} Locating instances of a queried object within large image collections.
+    \item \textbf{Surveillance and Multi-Object Tracking:} Monitoring specific targets across scenes without predefined class labels.
+    \item \textbf{Industrial Inspection and Quality Control:} Detecting defects or anomalies using minimal annotated samples.
+    \item \textbf{Remote Sensing and Earth Observation:} Segmenting environmental features from satellite imagery using few references.
+    \item \textbf{Augmented and Mixed Reality:} Identifying user-specified objects in real time for interactive overlays.
+\end{itemize}
+
+\newpage
+
+% ==========================================
+% CHAPTER 5: FOUNDATION MODELS AND SAM
+% ==========================================
+\section{Foundation Models and SAM}
+
+\subsection{Architecture of SAM}
+The Segment Anything Model (SAM) is arguably the most prominent vision foundation model developed to date. It is designed to perform class-agnostic segmentation and consists of three highly optimized, distinct core components:
+
+1. \textbf{Image Encoder:} A Masked Autoencoder (MAE) pre-trained Vision Transformer (typically ViT-H, containing 632 million parameters) that processes high-resolution inputs ($1024 \times 1024$) into a compact, highly expressive feature grid ($64 \times 64 \times 256$). This encoder is computationally heavy and represents the primary latency bottleneck of the model; however, it only needs to run once per image.
+2. \textbf{Prompt Encoder:} A lightweight module that embeds spatial prompts (points, bounding boxes, dense masks) and textual prompts into the 256-dimensional latent space.
+3. \textbf{Mask Decoder:} A highly efficient, lightweight two-way transformer block that iteratively updates image embeddings and prompt embeddings via bidirectional cross-attention, ultimately outputting multi-scale mask predictions.
+
+\begin{figure}[htbp]
+\centering
+\IfFileExists{SAM.png}{%
+    \includegraphics[width=1\linewidth]{SAM.png}%
+}{%
+    \framebox[\linewidth]{\rule{0pt}{200pt}\textbf{Missing Image: SAM.png}}%
+}
+\caption{Detailed architecture of the Segment Anything Model (SAM) highlighting the heavy Image Encoder, the flexible Prompt Encoder, and the lightweight, real-time Mask Decoder.}
+\label{fig:SAM}
+\end{figure}
+
+\subsection{Prompting Mechanisms and Positional Encodings}
+The prompt encoder handles different prompt types via distinct mathematical operations. It embeds discrete spatial prompts (points and bounding boxes) via continuous Fourier-based positional encodings, mapped to the exact coordinate space of the extracted image features:
+\begin{equation}
+    PE(x, y) = [\sin(2\pi \mathbf{B} [x,y]^T), \cos(2\pi \mathbf{B} [x,y]^T)]
+\end{equation}
+where $\mathbf{B}$ is a randomly initialized Gaussian matrix. 
+
+Conversely, dense mask prompts are encoded using cascaded convolutional downsampling layers coupled with GELU activations. These encoded mask features are then summed element-wise directly with the ViT image embeddings prior to entering the two-way transformer decoder. 
+
+\subsection{The Semantic-Geometric Gap}
+SAM was trained using a highly rigorous data engine loop, resulting in the unprecedented SA-1B dataset containing over 11 million images and 1 billion high-quality masks. This training enforces extreme geometric robustness. While SAM exhibits unparalleled zero-shot generalization to unseen images and complex multi-object compositions, this generalization is strictly \textit{spatial and geometric}. 
+
+The model identifies pristine boundaries and generates exceptional object proposals, but it \textit{does not} assign semantic or categorical labels to these regions. Consequently, SAM cannot inherently process a support image-mask pair to locate a semantically identical object in a different query image. External conditioning mechanisms must be engineered to translate the semantic intent of the support set into discrete points, boxes, or dense feature prompts that SAM's rigid decoder can natively process.
+
+\newpage
+
+% ==========================================
+% CHAPTER 6: METHODOLOGICAL TAXONOMY
+% ==========================================
+\section{Methodological Taxonomy}
+
+To systematically analyze the state-of-the-art in adapting SAM for few-shot tasks, this report categorizes the current body of literature into a clear, progressive methodological taxonomy. These six approaches differ fundamentally in how they bridge the semantic-geometric gap and interact with the frozen foundation architecture.
+
+\begin{enumerate}
+    \item \textbf{Prompt-Based Adaptation (VRP-SAM):} Methods that focus on learning a direct, deterministic mapping from the support image-mask pair to SAM's native prompt token space via meta-learned cross-attention layers.
+    \item \textbf{Probabilistic Prompting (ProSAM):} Architectures that identify the brittleness of deterministic tokens and model prompt embeddings as multivariate distributions to increase boundary robustness and marginalize uncertainty.
+    \item \textbf{Feature Matching Approaches (Matcher):} Frameworks that establish direct, dense pixel-to-pixel or region-to-region correspondence matrices between support and query images, treating the foundation model strictly as a zero-shot feature extractor rather than a tunable network.
+    \item \textbf{Consistency-Based Methods (DC-SAM):} Models that enforce semantic alignment between initial visual prompts and the resulting output masks via real-time cyclic validation and attention-weight penalties.
+    \item \textbf{Graph-Based Reasoning (Bridge-the-Points):} Approaches that propagate semantic information through structured topological graph representations, explicitly modeling negative background regions to filter out structural false positives.
+    \item \textbf{Prototype-Based Modeling (FCP-SAM):} Networks that abandon discrete spatial points entirely, instead aggregating dense support features into compact, holistic representations (prototypes) to guide query processing via iterative cross-attention mapping.
+\end{enumerate}
+
+\newpage
+
+% ==========================================
+% CHAPTER 7: VRP-SAM
+% ==========================================
+\section{VRP-SAM: Prompt-Based Adaptation}
+
+\subsection{Motivation and Overview}
+Directly applying SAM to few-shot semantic segmentation tasks is hindered by its strict reliance on manual geometric prompts (e.g., a human clicking on the object of interest). VRP-SAM (Visual Reference Prompt-SAM) directly addresses this by automating prompt generation. It aims to convert visual reference data (the support image and its binary mask) directly into compatible prompt embeddings, effectively eliminating the human-in-the-loop requirement and allowing SAM to function as an autonomous few-shot segmenter.
+
+\begin{figure}[htbp]
+    \centering
+    \IfFileExists{VRP-SAM-1.png}{%
+        \includegraphics[width=1\linewidth]{VRP-SAM-1.png}%
+    }{%
+        \framebox[\linewidth]{\rule{0pt}{200pt}\textbf{Missing Image: VRP-SAM-1.png}}%
+    }
+    \caption{Comparison of SAM’s built-in Point and Box prompt modes with Visual Reference Prompt when handling numerous images. The prompts are all provided by users.}
+    \label{fig:VRP-SAM-1.png}
+\end{figure}
+
+\subsection{Architecture and Feature Augmentation}
+VRP-SAM introduces a dedicated Visual Reference Prompt (VRP) encoder. It acts as a specialized intermediary, processing the support set and outputting tokens that mimic the mathematical behavior and dimensionality of SAM's native point prompts. 
+
+However, relying solely on SAM's ViT encoder to extract features from the support image is problematic; SAM's features are highly geometric but semantically sparse. To prevent the frozen ViT from overlooking vital semantic details, the VRP encoder utilizes an auxiliary semantic-aware image encoder (typically a ResNet-50) to encode both the reference and target images into a shared, semantically rich latent space before prompt generation occurs.
+
+\begin{figure}[htbp]
+    \centering
+    \IfFileExists{VRP-SAM-2.png}{%
+        \includegraphics[width=1\linewidth]{VRP-SAM-2.png}%
+    }{%
+        \framebox[\linewidth]{\rule{0pt}{200pt}\textbf{Missing Image: VRP-SAM-2.png}}%
+    }
+    \caption{A Comparison between SAM and VRP-SAM. VRP-SAM introduces a visual reference prompt encoder, accepting annotated reference images with point, scribble, box, and mask formats, offering a distinct enhancement over SAM.}
+    \label{fig:VRP-SAM-2}
+\end{figure}
+
+\subsection{Mathematical Conditioning Mechanism}
+The core adaptation logic in VRP-SAM relies on $N$ learnable query tokens, defined as $Q \in \mathbb{R}^{N \times C}$, where $C=256$ matches SAM's latent dimensionality. These queries are designed to aggregate the target's semantic information from the support image. They interact with the extracted reference features via a multi-head cross-attention mechanism. 
+
+The attention operation is mathematically formulated as:
+\begin{equation}
+    P_{VRP} = \text{Softmax}\left(\frac{Q K_s^T}{\sqrt{d_k}}\right)V_s
+\end{equation}
+where $K_s$ and $V_s$ are the key and value projections generated from the foreground support features $F_s^{fg}$, and $d_k$ represents the scaling factor to prevent vanishing gradients during Softmax computation.
+
+\begin{figure}[htbp]
+    \centering
+    \IfFileExists{VRP-SAM-3.png}{%
+        \includegraphics[width=1\linewidth]{VRP-SAM-3.png}%
+    }{%
+        \framebox[\linewidth]{\rule{0pt}{200pt}\textbf{Missing Image: VRP-SAM-3.png}}%
+    }
+    \caption{VRP-SAM framework. The approach enables SAM to perform visual reference segmentation by extends a VRP encoder. It takes various granularities of visual references as inputs and encodes these visual references into prompt embeddings. The VRP encoder consists of a feature augmenter and a prompt generator.}
+    \label{fig:VRP-SAM-3}
+\end{figure}
+
+\begin{algorithm}[H]
+\caption{VRP-SAM Inference Pipeline}
+\begin{algorithmic}[1]
+\REQUIRE Support Image $I_s$, Support Mask $M_s$, Query Image $I_q$
+\STATE Extract semantic features via auxiliary network: $F_s = \text{ResNet}(I_s)$, $F_q = \text{ResNet}(I_q)$
+\STATE Apply binary mask $M_s$ to $F_s$ to explicitly isolate the target foreground: $F_s^{fg} = F_s \odot M_s$
+\STATE Initialize $N$ learnable queries $Q$
+\STATE Generate Visual Reference Prompt via Cross-Attention: $P_{VRP} = \text{CrossAttention}(Q, F_s^{fg}, F_s^{fg})$
+\STATE Extract geometric query features via foundation model: $E_q = \text{SAM\_Encoder}(I_q)$
+\STATE Predict High-Resolution Mask: $\hat{M}_q = \text{SAM\_Decoder}(E_q, P_{VRP})$
+\RETURN $\hat{M}_q$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Strengths and Limitations}
+\textbf{Strengths:} VRP-SAM establishes a highly computationally efficient baseline. Because the massive SAM backbone remains entirely frozen and the VRP encoder is relatively lightweight, it can process images at high FPS, making it suitable for real-time applications. It perfectly preserves SAM's native geometric boundary precision.\\
+\textbf{Limitations:} The method is highly susceptible to prompt sensitivity. The deterministic, rigid nature of $P_{VRP}$ means that if the target object in the query image undergoes severe structural deformation (e.g., the articulation of a human body or the folding of a piece of clothing), the prompt embedding struggles to adapt to the new spatial reality, resulting in cascading decoder failures and fragmented mask outputs.
+
+\newpage
+
+% ==========================================
+% CHAPTER 8: PROSAM
+% ==========================================
+\section{ProSAM: Probabilistic Prompting}
+
+\subsection{Motivation}
+Deterministic prompt generation, as utilized in VRP-SAM, is inherently brittle. SAM's mask decoder is highly non-linear; slight mathematical perturbations or variations in generated prompt tokens can cause the decoder to produce vastly different, often suboptimal, mask proposals. ProSAM fundamentally posits that modeling prompt uncertainty mathematically mitigates this instability. Unstable point prompts generated near the spatial boundaries of the target region are highly vulnerable to visual noise, whereas prompts generated near the object's center of mass yield much more robust segmentation.
+
+\begin{figure}[htbp]
+    \centering
+    \IfFileExists{PRO-SAM-1.png}{%
+        \includegraphics[width=1\linewidth]{PRO-SAM-1.png}%
+    }{%
+        \framebox[\linewidth]{\rule{0pt}{200pt}\textbf{Missing Image: PRO-SAM-1.png}}%
+    }
+    \caption{The same mask can be generated by SAM using various prompts in a region.}
+    \label{fig:PRO-SAM-1}
+\end{figure}
+
+\subsection{Variational Prompt Encoder and KL Divergence}
+The core architectural innovation of ProSAM is the complete replacement of the deterministic encoder with a Variational Prompt Encoder. Utilizing principles from Variational Autoencoders (VAEs), it employs the reparameterization trick to model the prompt space as a continuous multivariate Gaussian distribution rather than a discrete point in latent space. 
+
+Instead of a single discrete vector, the encoder predicts the mean vector $\mu$ and the covariance matrix $\Sigma$ of the target prompt embeddings. The model optimizes the Evidence Lower Bound (ELBO), explicitly minimizing the Kullback-Leibler (KL) divergence between the learned posterior distribution $q(Z|I_s, M_s)$ and a standard normal prior distribution $p(Z)$:
+\begin{equation}
+    \mathcal{L}_{KL} = D_{KL}(q(Z|I_s, M_s) || p(Z))
+\end{equation}
+
+\begin{figure}[htbp]
+    \centering
+    \IfFileExists{PRO-SAM-2.png}{%
+        \includegraphics[width=1\linewidth]{PRO-SAM-2.png}%
+    }{%
+        \framebox[\linewidth]{\rule{0pt}{200pt}\textbf{Missing Image: PRO-SAM-2.png}}%
+    }
+    \caption{Intuitive illustration of the high-level idea behind the proposed variational prompt encoder. The dashed arrow shows the sampling and prompting procedure during training, while the solid arrow shows the prompting strategy during inference. Note that our generated prompts can be any type of prompt, while this illustration shows a positive point prompt as an example.}
+    \label{fig:PRO-SAM-2}
+\end{figure}
+
+\subsection{Probabilistic Conditioning and Laplacian Penalty}
+During the mask generation phase at inference, ProSAM draws $K$ multiple prompt vector samples from the learned distribution $Z$. To optimally structure the latent space, it applies a geometric Laplacian penalty during meta-training. This penalty encourages the expected prompt embedding to reside in flatter, low-curvature regions of the loss landscape:
+\begin{equation}
+    \mathcal{L}_{Laplacian} = \lambda \sum_i \left| \nabla^2 \mathcal{L}_{CE}(\mu_i) \right|
+\end{equation}
+By strictly penalizing high-curvature regions, ProSAM structurally pushes the mean prompt $\mu$ toward the spatial center of the target region, safely away from ambiguous, noisy object boundaries.
+
+\begin{figure}[htbp]
+    \centering
+    \IfFileExists{PRO-SAM-3.png}{%
+        \includegraphics[width=1\linewidth]{PRO-SAM-3.png}%
+    }{%
+        \framebox[\linewidth]{\rule{0pt}{200pt}\textbf{Missing Image: PRO-SAM-3.png}}%
+    }
+    \caption{The overview of ProSAM, which segments the target images based on the visual references. Given a pre-trained SAM, a variational prompt encoder is trained to predict a multivariate prompt distribution with reparameterization trick. During the inference, the predicted mean prompt is employed to guide SAM in producing robust mask prediction for the target image.}
+    \label{fig:PRO-SAM-3}
+\end{figure}
+
+\begin{algorithm}[H]
+\caption{ProSAM Probabilistic Inference Pipeline}
+\begin{algorithmic}[1]
+\REQUIRE Support $(I_s, M_s)$, Query $I_q$, Number of Monte Carlo Samples $K$
+\STATE Predict distribution parameters: $\mu, \Sigma = \text{VariationalEncoder}(I_s, M_s)$
+\STATE Extract high-resolution query features: $E_q = \text{SAM\_Encoder}(I_q)$
+\FOR{$k = 1$ to $K$}
+    \STATE Sample continuous prompt: $z_k = \mu + \epsilon_k \odot \Sigma^{1/2}, \quad \text{where } \epsilon_k \sim \mathcal{N}(0, I)$
+    \STATE Predict candidate binary mask: $M_k = \text{SAM\_Decoder}(E_q, z_k)$
+\ENDFOR
+\STATE Marginalize geometric uncertainty by averaging candidates: $\hat{M}_q = \frac{1}{K} \sum_{k=1}^K M_k$
+\RETURN Thresholded $\hat{M}_q$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Strengths and Limitations}
+\textbf{Strengths:} ProSAM is exceptionally robust to boundary ambiguities and severe structural deformations. Marginalizing out prompt uncertainty yields stable predictions, making it particularly ideal for complex domains like medical imaging where tissue boundaries are inherently fuzzy.\\
+\textbf{Limitations:} The necessity of sampling and processing multiple prompt candidates (requiring $K$ distinct, sequential passes through SAM's decoder network) substantially increases the overall computational overhead and inference latency, rendering it less suitable for high-speed video processing compared to deterministic methods.
+
+\newpage
+
+% ==========================================
+% CHAPTER 9: MATCHER
+% ==========================================
+\section{Matcher: Feature Matching Approaches}
+
+\subsection{Motivation and Clarification}
+Rather than compressing rich semantic information into SAM's extremely limited prompt dimensionality ($C=256$), Matcher \cite{liu2023matcher} leverages vision foundation models purely for dense feature extraction. \textbf{It is critical to clarify that Matcher is strictly an all-purpose feature matching framework, not a personalized segmentation model.} It strictly bypasses prompt engineering; it does not update foundation weights, nor does it train a task-specific meta-learner. It mathematically treats Few-Shot Segmentation purely as a dense coordinate-matching problem.
+
+\begin{figure}[htbp]
+    \centering
+    \IfFileExists{MATCHER-1.png}{%
+        \includegraphics[width=1\linewidth]{MATCHER-1.png}%
+    }{%
+        \framebox[\linewidth]{\rule{0pt}{200pt}\textbf{Missing Image: MATCHER-1.png}}%
+    }
+    \caption{Illustration of the proposed bidirectional matching. Bidirectional matching consists of three steps: forward matching, reverse matching, and mask filtering. Purple points denote the matched points. Red points denote the outliers.}
+    \label{fig:MATCHER-1}
+\end{figure}
+
+\subsection{Dense Correlation and Bidirectional Matching}
+Matcher utilizes a robust, self-supervised foundation model backbone (e.g., DINOv2 \cite{oquab2023dinov2}) to extract semantically meaningful, patch-level features. It constructs a dense correlation volume by computing the cosine similarity between every pixel in the query image $E_q \in \mathbb{R}^{H_q W_q \times C}$ and the foreground pixels in the support image $E_s^{fg} \in \mathbb{R}^{N_{fg} \times C}$:
+\begin{equation}
+    C_{i,j} = \frac{E_{q,i} \cdot E_{s,j}^{fg}}{||E_{q,i}|| ||E_{s,j}^{fg}||}
+\end{equation}
+
+To systematically eliminate matching outliers and visual hallucinations, Matcher employs a bidirectional matching strategy:
+1. \textbf{Forward Matching:} Finds the coordinate with maximum similarity from the Reference domain to the Target domain.
+2. \textbf{Reverse Matching:} Finds the coordinate with maximum similarity from the Target domain back to the Reference domain.
+
+Only coordinates that are mutually agreed upon by both passes (cycle-consistent matches) are retained as valid, high-confidence spatial point prompts to be fed into SAM.
+
+\subsection{Instance-Level Matching via Earth Mover's Distance}
+Even with bidirectional filtering, SAM may output fragmented or false-positive masks when fed the selected point prompts. To suppress these, Matcher evaluates mask proposals using the Earth Mover's Distance (EMD). EMD computes the structural and spatial distance between the reference mask distribution $P$ and the query mask distribution $Q$:
+
+\begin{equation}
+    EMD(P, Q) = \frac{\min_{F=(f_{ij})} \sum_{i,j} f_{ij} d_{ij}}{\sum_{i,j} f_{ij}}
+\end{equation}
+
+By calculating the minimum cost to transform the query mask distribution into the support mask distribution, Matcher filters out highly divergent proposals, ensuring only structurally coherent masks are merged into the final output.
+
+\begin{figure}[htbp]
+    \centering
+    \IfFileExists{MATCHER-2.png}{%
+        \includegraphics[width=1\linewidth]{MATCHER-2.png}%
+    }{%
+        \framebox[\linewidth]{\rule{0pt}{200pt}\textbf{Missing Image: MATCHER-2.png}}%
+    }
+    \caption{An overview of Matcher. The training-free framework addresses various segmentation tasks through three operations: Correspondence Matrix Extraction, Prompts Generation, and Controllable Masks Generation.}
+    \label{fig:MATCHER-2}
+\end{figure}
+
+\begin{algorithm}[H]
+\caption{Matcher Feature Alignment Pipeline}
+\begin{algorithmic}[1]
+\REQUIRE Support $(I_s, M_s)$, Query $I_q$
+\STATE Extract dense features: $E_s = \text{DINOv2}(I_s)$, $E_q = \text{DINOv2}(I_q)$
+\STATE Extract foreground reference features: $E_s^{fg} = E_s \odot M_s$
+\STATE Compute Correlation Matrix: $C_{sq} = E_s^{fg} \cdot E_q^T$
+\STATE Filter matches via Bidirectional Check: $P_{coords} = \text{Bidirectional}(C_{sq})$
+\STATE Feed verified coordinates as native points: $M_{candidates} = \text{SAM\_Decoder}(P_{coords})$
+\STATE Evaluate candidates via $EMD(M_s, M_{candidate})$
+\RETURN Merged true-positive masks $\hat{M}_q$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Strengths and Limitations}
+\textbf{Strengths:} Matcher requires absolutely zero task-specific training or parameter updates, operating in a pure, elegant zero-shot paradigm. The methodology is highly interpretable.\\
+\textbf{Limitations:} Matcher is highly prone to distractor suppression failures. If background elements in the query image share high feature similarity with the target object (e.g., segmenting a specific dog breed when multiple different dogs are in the background), the correlation volume inevitably generates false-positive spatial prompts that SAM will subsequently segment.
+
+\newpage
+
+% ==========================================
+% CHAPTER 10: DC-SAM
+% ==========================================
+\section{DC-SAM: Consistency-Based Adaptation}
+
+\subsection{Motivation}
+In-context segmentation often suffers from semantic drift, where generated prompts fail to align precisely with the target class, drifting onto adjacent, visually similar objects during the decoding process. DC-SAM \cite{qi2025dcsam} addresses this by introducing cyclical validation to ensure rigorous semantic consistency between the initial reference intent and the final prediction.
+
+\subsection{Dual-Consistency Mechanism and Cyclic Loss}
+The architecture first fuses geometric features extracted by the frozen SAM encoder with semantic features obtained from a pre-trained auxiliary backbone. It implements a Cyclic Consistent Cross-Attention module. 
+
+After generating an initial coarse mask $\hat{M}_{coarse}$, DC-SAM maps this segmentation output back into the prompt space, calculating the mathematical deviation $\Delta$ from the original reference intent:
+\begin{equation}
+    \mathcal{L}_{cyclic} = || P_{init} - \mathcal{F}_{reproject}(\hat{M}_{coarse}) ||_2^2
+\end{equation}
+Attention weights for cyclically inconsistent features are forced to negative infinity. This explicitly corrects semantic drift in real-time, heavily penalizing the network if the generated mask does not structurally match the initial visual prompt constraints.
+
+\subsection{Positive and Negative Prompting}
+DC-SAM fundamentally improves robustness by employing a dual-branch strategy. While most architectures solely extract discriminative positive prompts from the target foreground, DC-SAM explicitly utilizes the inverted background mask ($1 - M_s$) to generate explicit negative prompts. This dual representation pushes the latent embeddings of the target and background apart in the high-dimensional space, significantly enhancing discriminative power in cluttered scenes.
+
+\begin{figure}[htbp]
+    \centering
+    \IfFileExists{DC-SAM-1.png}{%
+        \includegraphics[width=1\linewidth]{DC-SAM-1.png}%
+    }{%
+        \framebox[\linewidth]{\rule{0pt}{200pt}\textbf{Missing Image: DC-SAM-1.png}}%
+    }
+    \caption{Illustration of The proposed cyclic consistent cross-attention mechanism. This figure shows the version applied to query features with one head. The “Cyc” operation ultimately generates a bias to filter out features that are not cycle-consistent.}
+    \label{fig:DC-SAM-1}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \IfFileExists{DC-SAM-2.png}{%
+        \includegraphics[width=1\linewidth]{DC-SAM-2.png}%
+    }{%
+        \framebox[\linewidth]{\rule{0pt}{200pt}\textbf{Missing Image: DC-SAM-2.png}}%
+    }
+    \caption{Overview of the proposed DC-SAM framework. We use positive and negative branches to generate respective prompts, thereby refining the scope of the final generated mask. Additionally, we incorporate SAM features during the prompt generation process to better capture the characteristics of SAM, resulting in more accurate prompt boundaries. During the prompt generation process, we introduce cyclic consistent cross-attention to filter out non-cycle-consistent feature points, enhancing the precision of the prompts.}
+    \label{fig:DC-SAM-2}
+\end{figure}
+
+\begin{figure}[htbp]
+    \centering
+    \IfFileExists{DC-SAM-3.png}{%
+        \includegraphics[width=1\linewidth]{DC-SAM-3.png}%
+    }{%
+        \framebox[\linewidth]{\rule{0pt}{200pt}\textbf{Missing Image: DC-SAM-3.png}}%
+    }
+    \caption{Illustration of The proposed DC-SAM framework with SAM2. Unlike the image-level framework, we train the entire model for the video to acquire the image-to-video prompt ability. They apply different data augmentation techniques to the query image, and the augmented images compose a mask tube for training.}
+    \label{fig:DC-SAM-3}
+\end{figure}
+
+\begin{algorithm}[H]
+\caption{DC-SAM Dual Consistency Loop}
+\begin{algorithmic}[1]
+\REQUIRE Support $(I_s, M_s)$, Query $I_q$
+\STATE Extract Positive Prompts $P^+$ from $M_s$
+\STATE Extract Negative Prompts $P^-$ from $(1 - M_s)$
+\STATE Generate initial coarse prediction $\hat{M}_{coarse}$
+\STATE Cyclic Check: Re-project $\hat{M}_{coarse}$ to prompt space $\hat{P}_{cyclic}$
+\STATE Calculate consistency divergence: $\Delta = ||P^+ - \hat{P}_{cyclic}||_2$
+\STATE Update Cross-Attention weights based on $\Delta$ (penalize high divergence)
+\STATE Generate final mask $\hat{M}_q$ with updated attention constraints
+\RETURN $\hat{M}_q$
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Strengths and Limitations}
+\textbf{Strengths:} DC-SAM exhibits exceptional distractor suppression capabilities. The explicit negative branching ensures strong generalization across both complex static images and continuous video domains (e.g., IC-VOS benchmark).\\
+\textbf{Limitations:} The dual-branch architecture and recursive cyclic attention loops substantially increase the memory footprint and computational overhead, making it difficult to deploy on mobile or edge devices with restricted VRAM.
+
+\newpage
+
+% ==========================================
+% CHAPTER 11: BRIDGE-THE-POINTS
+% ==========================================
+\section{Bridge-the-Points: Graph-Based Reasoning}
+
+\subsection{Motivation}
+Dense clutter and multi-instance occlusion frequently confuse standard cross-attention mechanisms, which struggle to differentiate between adjacent, overlapping instances of the same object class. Bridge-the-Points \cite{zhang2024bridge} resolves this by mapping the spatial relationships within images as a topological graph, enabling advanced structural reasoning over semantic regions rather than relying on isolated pixel affinities.
+
+\subsection{Graph-Based Prompt Generation and Adjacency}
+The architecture utilizes a Positive-Negative Alignment (PNA) module to partition the pixel-wise correlation matrix into distinct foreground and background similarities, explicitly uncovering background context as negative references. Subsequently, a Point-Mask Clustering (PMC) module constructs a directed graph $\mathcal{G} = (\mathcal{V}, \mathcal{E})$. Vertices $\mathcal{V}$ represent selected points and their corresponding local masks, while edges $\mathcal{E}$ denote mask coverage over points. 
+
+The adjacency matrix $A \in \mathbb{R}^{|\mathcal{V}| \times |\mathcal{V}|}$ defines the topological connections between spatial proposals. Vertices are clustered by identifying strongly connected components within the graph, effectively isolating the true target region from disconnected background noise.
+
+\subsection{Structural Reasoning and Post-Gating}
+To mitigate false positives, the method introduces strict post-gating strategies based on graph connectivity:
+\begin{itemize}
+    \item \textbf{Positive Gating:} Employs a mask growth algorithm evaluating pixel polarities to enforce spatial consistency.
+    \item \textbf{Overshooting Gating:} Filters outlier points near object boundaries by measuring self-consistency between point features and the union mask of the connected component. If a predicted region lacks strong semantic edges connecting it back to the support nodes, the subgraph is severed and discarded entirely.
+\end{itemize}
+
+\subsection{Strengths and Limitations}
+\textbf{Strengths:} A highly efficient, tuning-free pipeline that manages severe occlusion and complex background clutter through topological mathematics rather than brute-force feature matching. \\
+\textbf{Limitations:} Constructing and traversing the directed graph scales poorly—approaching $\mathcal{O}(|\mathcal{V}|^2)$ complexity—with the number of generated candidate points. This introduces massive latency bottlenecks for high-resolution imagery where the candidate point subset exceeds thousands of nodes.
+
+\begin{figure}[htbp]
+    \centering
+    \IfFileExists{BRIDGE-THE-POINTS-1.png}{%
+        \includegraphics[width=1\linewidth]{BRIDGE-THE-POINTS-1.png}%
+    }{%
+        \framebox[\linewidth]{\rule{0pt}{200pt}\textbf{Missing Image: BRIDGE-THE-POINTS-1.png}}%
+    }
+    \caption{Overview of The approach, where the Positive-Negative Alignment module recognizes the correlation between target features and reference features for point selection, the Point-Mask Clustering module efficiently clusters the points based on the coverage of corresponding masks, and Post-Gating filters out the false-positive masks for generating final prediction.}
+    \label{fig:BRIDE-THE-POINTS-1}
+\end{figure}
+
+\newpage
+
+% ==========================================
+% CHAPTER 12: FCP-SAM
+% ==========================================
+\section{FCP-SAM: Prototype-Based Modeling}
+
+\subsection{Motivation}
+Discrete point and box prompts lack the capacity to convey complex, non-rigid object structures (e.g., fishing netting, smoke, complex biological forms like a spiderweb). FCP-SAM \cite{park2025fcpsam} abandons discrete geometric prompts, generating comprehensive, dense prototypes to guide the segmentation process via global feature modulation.
+
+\begin{figure}[htbp]
+    \centering
+    \IfFileExists{FCP-SAM-1.png}{%
+        \includegraphics[width=1\linewidth]{FCP-SAM-1.png}%
+    }{%
+        \framebox[\linewidth]{\rule{0pt}{200pt}\textbf{Missing Image: FCP-SAM-1.png}}%
+    }
+    \caption{Comparison between ResNet and SAM Image Encoder features on 1000 PASCAL VOC images in test dataset, demonstrating their complementary strengths. (a) Similarity difference between FG-to-FG and FG-to-BG within the image. The higher similarity difference shown in SAM Image Encoder features reflects its superior pixel-level aggregation for prototype construction. (b) Difference between the FG-toFG similarity from the same class (intra-class) and different classes (inter-class). Compared to SAM features, ResNet features convey better class consistency across different images.}
+    \label{fig:FCP-SAM-1}
+\end{figure}
+
+\subsection{Foreground-Covering Prototype Generation}
+FCP-SAM aggregates pixel-level features into dense, learnable tokens. It uniquely extracts SAM Image Encoder features for spatial granularity (taking advantage of SAM's high pixel-level similarity within instances) and couples them with auxiliary ResNet features to maintain rigid class consistency across vastly different query domains. 
+
+Iterative cross-attention aggregates these disparate features into a comprehensive, unified prototype vector $p_c$:
+\begin{equation}
+    p_c = \frac{1}{\sum_{i,j} M_{s}(i,j)} \sum_{i,j} M_{s}(i,j) F_{s}(i,j)
+\end{equation}
+where $F_s$ represents the concatenated feature space.
+
+\subsection{Prototype Matching and Attention Masks}
+Instead of relying on rigid geometric pseudo-masks, FCP-SAM introduces a dynamic, attention-based pseudo-mask derived directly from the cross-attention weights. The final probability map is generated via prototype-to-prototype matching in the latent space, effectively avoiding the structural noise inherent in traditional prototype-to-pixel correlation techniques.
+
+\begin{algorithm}[H]
+\caption{FCP-SAM Prototype Matching}
+\begin{algorithmic}[1]
+\REQUIRE Support $(I_s, M_s)$, Query $I_q$
+\STATE Extract geometric features: $G_s = \text{SAM\_Enc}(I_s)$, $G_q = \text{SAM\_Enc}(I_q)$
+\STATE Extract semantic features: $S_s = \text{ResNet}(I_s)$, $S_q = \text{ResNet}(I_q)$
+\STATE Generate Support Prototype $Proto_s$ via Iterative Cross-Attention
+\STATE Predict query attention mask $\hat{A}_q$
+\STATE Generate Query Prototype $Proto_q$ based on $\hat{A}_q$ and $S_q$
+\STATE Calculate Cosine Similarity: $\mathcal{S}(Proto_s, Proto_q) = \frac{Proto_s \cdot Proto_q}{||Proto_s|| ||Proto_q||}$
+\RETURN Final Mask $\hat{M}_q$ based on similarity score threshold
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{Strengths and Limitations}
+\textbf{Strengths:} Exceptional global context modeling leading to excellent multi-shot scaling capability. Combining multi-shot prototypes mathematically via vector averaging is fundamentally more stable than combining discrete point coordinates.\\
+\textbf{Limitations:} Reliance on a heavily parameterized auxiliary ResNet backbone for class consistency partially compromises the elegance, memory efficiency, and structural integrity of a pure, monolithic foundation model pipeline.
+
+\begin{figure}[htbp]
+    \centering
+    \IfFileExists{FCP-SAM-2.png}{%
+        \includegraphics[width=1\linewidth]{FCP-SAM-2.png}%
+    }{%
+        \framebox[\linewidth]{\rule{0pt}{200pt}\textbf{Missing Image: FCP-SAM-2.png}}%
+    }
+    \caption{Overall pipeline of foreground-covering prototype generation and matching. Given SAM image encoder features, foreground regions are first highlighted using the support ground-truth mask and a pseudo mask for the query. The guided features are aggregated into learnable tokens via cross-attention. Since SAM features are not consistent across images, ResNet features are additionally used to provide class-consistent information. These ResNet features are guided by the support mask and an attention-based pseudo mask for the query to enhance foreground representation. The refined information is injected into the tokens to produce support and query prototypes. Finally, the query prototypes are matched with the support prototypes to form visual prompts, which are fed to the SAM decoder to predict the final query segmentation mask.}
+    \label{FCP-SAM-2.png}
+\end{figure}
+
+\newpage
+
+% ==========================================
+% CHAPTER 13: DATASET DESCRIPTIONS & QUANTITATIVE RESULTS
+% ==========================================
+\section{Quantitative Results and Comparative Study}
+
+\subsection{Dataset Descriptions and Challenge Parameters}
+To provide a highly rigorous, comprehensive evaluation of the foundation models' generalization limits, experiments are synthesized across six distinct datasets. These datasets are strategically categorized into three testing domains: standard baselines (assessing core object extraction and distractor suppression), large-vocabulary benchmarks (pushing the limits of open-set scalability), and part-level semantics (evaluating high-resolution intra-object reasoning).
+
+\subsubsection{Standard Baselines}
+\begin{itemize}
+    \item \textbf{PASCAL-$5^i$ \cite{shaban2017one}:} Derived from the PASCAL VOC 2012 \cite{everingham2010pascal} and Semantic Boundaries Dataset (SBD). It contains 20 object categories divided evenly across 4 cross-validation folds. 
+    \textbf{Visual Characteristics:} Images typically feature centered, single-dominant foreground objects with moderate occlusion and relatively low background clutter. 
+    \textbf{Evaluation Role:} Serves as the standard baseline entry-point, primarily measuring basic foreground extraction precision and rudimentary semantic alignment.
+    
+    \item \textbf{MS COCO-$20^i$ \cite{nguyen2019feature}:} Derived from the MS COCO dataset \cite{lin2014microsoft}, this benchmark introduces a massive step up in structural complexity. It encompasses 80 diverse categories split into 4 testing folds. 
+    \textbf{Visual Characteristics:} Presents highly challenging scenes filled with dense multi-instance clutter, severe scale variation, and heavy subject occlusion. 
+    \textbf{Evaluation Role:} Serves as the primary ``Distractor Challenge,'' rigorously testing a model's capacity to suppress visually similar background elements and maintain accurate correspondence under chaotic contextual interference.
+\end{itemize}
+
+\subsubsection{Large-Vocabulary Benchmarks}
+\begin{itemize}
+    \item \textbf{FSS-1000 \cite{li2020fss}:} Designed explicitly to benchmark the limits of few-shot learning systems, containing 10,000 images spanning exactly 1,000 distinct, fine-grained categories.
+    \textbf{Visual Characteristics:} Focuses on rare or unconventional objects (e.g., obscure items, specific logos, specialized merchandise) presented against relatively clean backgrounds.
+    \textbf{Evaluation Role:} Evaluates extreme open-set generalization on entities entirely absent from standard foundation model pre-training distributions.
+    
+    \item \textbf{LVIS-$92^i$ \cite{gupta2019lvis}:} Derived from the Large Vocabulary Instance Segmentation benchmark, representing the upper bound of modern semantic complexity with a severe long-tailed distribution exceeding 1,200 unique categories.
+    \textbf{Visual Characteristics:} Contains extremely rare entities embedded inside highly complex and varied spatial layouts.
+    \textbf{Evaluation Role:} Acts as the ultimate scalability test, evaluating structural robustness against extreme data imbalance and the model's ability to avoid defaulting to common geometric priors.
+\end{itemize}
+
+\subsubsection{Part-Level Semantics}
+\begin{itemize}
+    \item \textbf{PASCAL-Part \cite{chen2014detect}:} A high-resolution, fine-grained extension of the foundational PASCAL VOC dataset. It shifts the task definition from bounding entire objects to identifying specific anatomical or structural parts.
+    \textbf{Visual Characteristics:} Target regions frequently possess minimal visual contrast against adjacent sub-parts (e.g., separating a dog's leg from its torso).
+    \textbf{Evaluation Role:} Validates the network's capacity for high-resolution, intra-object geometric localization.
+    
+    \item \textbf{PACO-Part \cite{ramanathan2023paco}:} The Parts and Attributes of Common Objects dataset provides unparalleled semantic depth, spanning 75 distinct object categories subdivided into over 200 diverse part categories.
+    \textbf{Visual Characteristics:} Features highly complex contextual interactions and ambiguous object-part compositions.
+    \textbf{Evaluation Role:} Serves as a rigorous evaluation of fine-grained structural reasoning, ensuring models establish true semantic correspondences rather than relying on coarse visual proxies.
+\end{itemize}
+
+\subsection{Evaluation Protocol}
+Models are rigorously evaluated using the mean Intersection over Union (mIoU) metric, calculated over cross-validation folds:
+\begin{equation}
+    mIoU = \frac{1}{C} \sum_{c=1}^C \frac{TP_c}{TP_c + FP_c + FN_c}
+\end{equation}
+where $C$ is the number of classes, and $TP, FP, FN$ denote true positives, false positives, and false negatives, respectively.
+
+\subsection{Standard and Large-Vocabulary Few-Shot Segmentation}
+
+\noindent\textbf{Evaluation Protocol.}
+To comprehensively assess the effectiveness of recent reference-guided few-shot segmentation methods, we evaluate performance across both standard and large-vocabulary benchmarks that exhibit complementary characteristics. The selected datasets include PASCAL-$5^i$, COCO-$20^i$, FSS-1000, and LVIS-$92^i$, which collectively cover a wide spectrum of scene complexity, object diversity, and distractor density. Performance is measured using mean Intersection-over-Union (mIoU), the standard metric for few-shot segmentation, under both 1-shot and 5-shot settings. This multi-dataset evaluation protocol enables a rigorous analysis of each method’s ability to generalize from limited reference examples while maintaining robustness to clutter, semantic diversity, and long-tail category distributions. 
+
+The quantitative results extracted from the evaluated methodologies are presented in Table \ref{tab:results_overall}. 
+
+\begin{table}[htbp]
+\centering
+\caption{Overall Quantitative Results (mIoU \%) on Standard and Large-Vocabulary Datasets}
+\label{tab:results_overall}
+\resizebox{\linewidth}{!}{
+\begin{tabular}{l l c c c c c c c c}
+\toprule
+\textbf{Method} & \textbf{Backbone} & \multicolumn{2}{c}{\textbf{PASCAL-5i}} & \multicolumn{2}{c}{\textbf{COCO-20i}} & \multicolumn{2}{c}{\textbf{FSS-1000}} & \multicolumn{2}{c}{\textbf{LVIS-92i}} \\
+\cmidrule(lr){3-4} \cmidrule(lr){5-6} \cmidrule(lr){7-8} \cmidrule(lr){9-10}
+& & \textbf{1-s} & \textbf{5-s} & \textbf{1-s} & \textbf{5-s} & \textbf{1-s} & \textbf{5-s} & \textbf{1-s} & \textbf{5-s} \\
+\midrule
+VRP-SAM \cite{sun2024vrp} & ResNet-50 & 71.9 & 72.9 & 53.9 & -- & -- & -- & -- & -- \\
+VRP-SAM \cite{sun2024vrp} & DINOv2 & -- & -- & 60.4 & -- & -- & -- & -- & -- \\
+ProSAM \cite{wang2025prosam} & ResNet-50 & 72.04 & -- & 54.63 & -- & -- & -- & -- & -- \\
+ProSAM \cite{wang2025prosam} & DINOv2 & -- & -- & 59.16 & -- & -- & -- & -- & -- \\
+Matcher \cite{liu2023matcher} & DINOv2 & -- & -- & 52.7 & 60.7 & 87.0 & \textbf{89.6} & 33.0 & 40.0 \\
+DC-SAM \cite{qi2025dcsam} & ResNet-50 & 73.0 & -- & 55.5 & -- & -- & -- & -- & -- \\
+DC-SAM \cite{qi2025dcsam} & DINOv2 & -- & -- & \textbf{62.0} & -- & -- & -- & -- & -- \\
+DC-SAM (SAM2) \cite{qi2025dcsam} & ResNet-50 & \textbf{74.0} & -- & 56.4 & -- & -- & -- & -- & -- \\
+Bridge-the-Points \cite{zhang2024bridge} & DINOv2 & 72.1 & \textbf{82.6} & 58.7 & \textbf{66.8} & \textbf{88.0} & 88.9 & \textbf{35.2} & \textbf{44.2} \\
+FCP-SAM \cite{park2025fcpsam} & ResNet-50 & 73.2 & 74.0 & 52.5 & 58.0 & -- & -- & -- & -- \\
+\bottomrule
+\multicolumn{10}{l}{\small \textit{*Note: Missing values indicate the metric was not explicitly reported in the primary study.}}
+\end{tabular}}
+\end{table}
+
+\noindent\textbf{Overall Analysis and Takeaway.}
+The cross-benchmark evaluation reveals that each dataset emphasizes a distinct aspect of reference-guided few-shot segmentation. PASCAL-$5^i$ primarily measures precise foreground extraction in scenes with a dominant object and limited distractors, leading to relatively small performance gaps between methods. COCO-$20^i$ introduces dense clutter and multiple co-occurring objects, thereby evaluating the ability to suppress distractors and maintain accurate correspondence under complex context. LVIS-$92^i$ constitutes the most challenging large-vocabulary setting, characterized by rare categories and long-tail distributions, testing scalability to extreme semantic diversity. FSS-1000, in contrast, assesses generalization across a large number of categories with comparatively clean scenes, emphasizing category-level transfer rather than distractor robustness.
+
+The quantitative results reflect these evaluation objectives. Methods based on consistency enforcement achieve the strongest performance on COCO-$20^i$ in the 1-shot regime, while graph-based reasoning demonstrates superior scalability on LVIS-$92^i$ and clear benefits in multi-shot settings, where relational modeling across support examples becomes increasingly important. On PASCAL-$5^i$, several approaches achieve comparable performance, indicating that simpler scenes reduce sensitivity to methodological differences.
+
+A consistent trend across methods reporting multiple backbones is the superiority of DINOv2 over ResNet-50. Substantial gains are observed when replacing convolutional features with self-supervised transformer representations. As explicitly detailed in Table~\ref{tab:backbone_comp}, improvements include jumping from 53.9\% to 60.4\% for VRP-SAM, 54.63\% to 59.16\% for ProSAM, and 55.5\% to 62.0\% for DC-SAM on the highly cluttered COCO-$20^i$ dataset. This pattern highlights the critical role of representation quality, suggesting that foundation-model encoders provide vastly more transferable semantic features for reference-guided segmentation tasks.
+
+\begin{table}[htbp]
+\centering
+\caption{Impact of Backbone Choice on COCO-$20^i$ (1-Shot mIoU \%)}
+\label{tab:backbone_comp}
+\begin{tabular}{l c c c}
+\toprule
+\textbf{Method} & \textbf{ResNet-50} & \textbf{DINOv2} & \textbf{Absolute Gain} \\
+\midrule
+VRP-SAM \cite{sun2024vrp} & 53.90 & 60.40 & \textcolor{green!60!black}{\textbf{+6.50}} \\
+ProSAM \cite{wang2025prosam} & 54.63 & 59.16 & \textcolor{green!60!black}{\textbf{+4.53}} \\
+DC-SAM \cite{qi2025dcsam} & 55.50 & 62.00 & \textcolor{green!60!black}{\textbf{+6.50}} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Collectively, these findings demonstrate that current methods exhibit dataset-dependent strengths and lack uniform robustness across varying levels of clutter, vocabulary size, and scene complexity. This inconsistency exposes a fundamental limitation of existing approaches and underscores the necessity for segmentation frameworks that integrate strong foundation-model representations with adaptive reasoning mechanisms capable of maintaining stable performance across both standard and large-vocabulary scenarios.
+
+\subsection{One-shot Object Part Segmentation}
+One-shot object part segmentation requires identifying and delineating semantic parts of an object (e.g., wheel, head, wing) from a single annotated reference example. Compared to whole-object segmentation, this task demands substantially finer-grained understanding, as the model must capture subtle intra-object boundaries, handle strong visual similarity between adjacent parts, and generalize part semantics across varying object poses and appearances.
+
+PASCAL-Part and PACO-Part constitute challenging benchmarks for this setting, each emphasizing different aspects of fine-grained reasoning. PASCAL-Part focuses on structured part decomposition of common object categories, testing the ability to localize well-defined components under moderate variation. PACO-Part, in contrast, introduces greater diversity in object-part compositions and more complex contextual interactions, thereby evaluating robustness to higher semantic granularity and ambiguity.
+
+The quantitative results in Table~\ref{tab:part_seg} indicate that both evaluated methods achieve substantially lower mIoU compared to whole-object segmentation benchmarks, confirming the increased difficulty of part-level reasoning. Bridge-the-Points achieves the best performance on both datasets, attaining 44.5\% on PASCAL-Part and 36.3\% on PACO-Part, outperforming Matcher by margins of 1.6 and 1.6 percentage points, respectively. This consistent improvement suggests that modeling structural relationships between regions is particularly beneficial for capturing fine-grained part correspondences, where simple feature matching may struggle to disambiguate visually similar components.
+
+Overall, the relatively low absolute performance across methods highlights one-shot part segmentation as an open challenge for reference-guided segmentation frameworks, underscoring the need for approaches capable of integrating precise localization with robust semantic reasoning at the intra-object level.
+
+\begin{table}[htbp]
+\centering
+\caption{Results (mIoU \%) on One-Shot Part Segmentation Datasets}
+\label{tab:part_seg}
+\begin{tabular}{l c c}
+\toprule
+\textbf{Method} & \textbf{PASCAL-Part (1-shot)} & \textbf{PACO-Part (1-shot)} \\
+\midrule
+Matcher \cite{liu2023matcher} & 42.9 & 34.7 \\
+Bridge-the-Points \cite{zhang2024bridge} & \textbf{44.5} & \textbf{36.3} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{Analysis of Trade-Offs and Complexity}
+
+The experimental results across standard, large-vocabulary, and part-level segmentation benchmarks reveal a clear trade-off between architectural complexity, computational efficiency, and segmentation robustness. Methods that introduce additional processing modules or multi-stage reasoning generally achieve higher accuracy but incur substantial increases in memory footprint, inference latency, and computational cost.
+
+On standard benchmarks such as PASCAL-$5^i$, where scenes contain dominant foreground objects and limited distractors, lightweight single-pass approaches (e.g., VRP-SAM) achieve competitive performance with significantly lower complexity, indicating that elaborate reasoning mechanisms are not strictly necessary under moderate conditions. However, performance gaps widen on more challenging datasets. On COCO-$20^i$ and LVIS-$92^i$, which emphasize distractor suppression and large-vocabulary generalization, methods employing consistency enforcement (DC-SAM variants) or relational reasoning (Bridge-the-Points) demonstrate clear advantages, albeit at increased computational expense. In particular, dual-branch cyclic refinement in DC-SAM and auxiliary feature processing in FCP-SAM improve segmentation accuracy but reduce real-time feasibility due to higher GFLOPs and lower inference throughput.
+
+Graph-based reasoning in Bridge-the-Points provides strong cross-domain robustness, achieving leading results on LVIS-$92^i$ and multi-shot settings, as well as consistent gains in one-shot part segmentation benchmarks (PASCAL-Part and PACO-Part). However, the explicit construction of region graphs introduces quadratic complexity with respect to the number of nodes, creating scalability challenges for high-resolution inputs and real-time applications. Similarly, prototype refinement mechanisms and multi-stage matching pipelines improve fine-grained correspondence but increase memory consumption and processing time.
+
+The backbone choice further influences this trade-off. Across multiple methods, replacing ResNet-50 with DINOv2 consistently improves segmentation accuracy on challenging datasets, reflecting the superior representational capacity of self-supervised transformer encoders. Nevertheless, these gains come at the cost of increased model size and computational requirements, reinforcing the tension between representation quality and efficiency.
+
+Results on one-shot object part segmentation highlight an additional dimension of complexity. Both Matcher and Bridge-the-Points exhibit substantially lower performance compared to whole-object segmentation tasks, indicating that fine-grained intra-object reasoning requires more sophisticated processing. Bridge-the-Points achieves the best results on PASCAL-Part and PACO-Part, suggesting that relational modeling is particularly beneficial for distinguishing visually similar object components, albeit with further computational overhead.
+
+Overall, the collective evidence indicates that no single approach simultaneously optimizes accuracy, efficiency, and scalability. Lightweight prompt-based methods offer favorable deployment characteristics but struggle in highly cluttered or fine-grained scenarios, whereas graph-based, consistency-driven, and prototype-enhanced methods deliver superior robustness at the expense of computational efficiency. This trade-off underscores the need for future reference-guided segmentation frameworks that can adaptively allocate computational resources according to scene complexity while maintaining strong generalization across diverse benchmarks.
+
+\newpage
+
+% ==========================================
+% CHAPTER 14: DISCUSSION
+% ==========================================
+\section{Discussion}
+
+\subsection{The Necessity of Explicit Semantic Alignment}
+The empirical results across standard, large-vocabulary, and part-level benchmarks consistently demonstrate that SAM's native geometric prompting mechanisms are insufficient for reliable reference-guided segmentation without additional semantic alignment. While point, box, or mask prompts provide coarse localization cues, they lack the capacity to encode category-level semantics or disambiguate visually similar regions. This limitation becomes particularly evident on COCO-$20^i$ and LVIS-$92^i$, where dense distractors and long-tail categories require precise semantic correspondence rather than geometric proximity. Methods incorporating explicit alignment mechanisms—such as prototype aggregation, graph-based relational reasoning, or cyclic consistency enforcement—consistently outperform simple prompt-based approaches under these challenging conditions.
+
+The necessity of semantic alignment is further reinforced by results on one-shot part segmentation datasets, where fine-grained intra-object boundaries must be distinguished despite minimal visual contrast between adjacent parts. The relatively low performance across methods on PASCAL-Part and PACO-Part indicates that geometric cues alone cannot capture subtle semantic distinctions within objects. Effective segmentation therefore requires mechanisms that explicitly map support features to query representations at the semantic level, preventing the model from defaulting to visually salient but irrelevant regions.
+
+\subsection{Methodological Insights on Negative Prompting}
+A consistent source of performance improvement across evaluated methods is the incorporation of explicit negative prompting, which leverages background regions as informative counterexamples. By treating non-target regions in the support image as negative references, models can better resolve ambiguities between the target object and visually similar distractors. This strategy proves particularly effective on cluttered datasets such as COCO-$20^i$ and LVIS-$92^i$, where background objects often share textures, colors, or shapes with the target category.
+
+Negative prompting also contributes to stability in multi-shot scenarios by preventing overfitting to dominant foreground patterns in the support set. Without explicit suppression of background features, models may incorrectly segment salient but irrelevant regions, especially when support examples are limited. These findings indicate that modeling both positive correspondences and negative constraints is essential for robust reference-guided segmentation.
+
+\subsection{Impact of Representation Quality and Backbone Choice}
+Across multiple evaluated methods, replacing convolutional backbones with self-supervised transformer encoders consistently yields substantial performance gains, particularly on challenging large-vocabulary benchmarks. The observed improvements when adopting DINOv2 instead of ResNet-50 highlight the importance of representation quality in establishing reliable cross-image correspondences. Transformer-based encoders provide stronger global context modeling and semantically aligned features, enabling improved generalization to unseen categories and complex scenes. These results suggest that the performance ceiling of reference-guided segmentation is strongly influenced by the underlying visual representation rather than architectural design alone.
+
+\subsection{Dataset-Dependent Performance Behavior}
+The evaluation reveals pronounced dataset-dependent strengths among methods, indicating that performance rankings vary across benchmarks with different characteristics. Lightweight prompt-based approaches remain competitive on PASCAL-$5^i$, where scenes contain dominant foreground objects and limited distractors. In contrast, methods incorporating relational reasoning or consistency enforcement demonstrate clear advantages on COCO-$20^i$ and LVIS-$92^i$, which emphasize cluttered environments and large vocabulary sizes. One-shot part segmentation datasets introduce an additional challenge by requiring fine-grained intra-object reasoning, resulting in substantially lower absolute performance across all methods. These observations highlight the importance of multi-benchmark evaluation for assessing generalization capability.
+
+\subsection{Trade-Offs Between Robustness and Computational Efficiency}
+The results indicate a fundamental trade-off between segmentation robustness and computational efficiency. Methods achieving strong performance on challenging datasets often employ multi-stage reasoning, graph construction, or cyclic refinement, which increases latency, memory consumption, and computational cost. Graph-based approaches demonstrate superior cross-domain accuracy but suffer from scalability limitations due to quadratic complexity in graph construction. Conversely, efficient single-pass prompt generators offer favorable deployment characteristics but struggle in complex scenes. This trade-off suggests the need for adaptive frameworks that dynamically adjust computational effort according to scene complexity.
+
+\subsection{Limitations of Current SAM-Based Adaptation Strategies}
+Despite significant progress, existing approaches rely heavily on auxiliary adaptation mechanisms to compensate for the limited semantic awareness of promptable foundation models. These mechanisms increase architectural complexity and reduce real-time feasibility. Furthermore, most methods assume accurate support annotations and do not address noisy or ambiguous reference masks, limiting applicability in practical scenarios. The consistently lower performance on part segmentation tasks further indicates that current approaches struggle with fine-grained semantic reasoning.
+
+\subsection{Implications for Future Research}
+The findings suggest that future reference-guided segmentation frameworks should integrate semantically aligned representations from foundation-model encoders, adaptive reasoning mechanisms for handling complex scenes, and efficient inference strategies for deployment. Developing architectures that balance these aspects while maintaining strong generalization across diverse benchmarks remains an open challenge. Addressing this challenge is essential for advancing few-shot segmentation with foundation models toward real-world applications.
+
+\newpage
+
+% ==========================================
+% CHAPTER 15: RESEARCH GAPS
+% ==========================================
+
+\section{Research Gaps and Future Directions}
+
+\subsection{Open Challenges: The Multi-Shot Degradation Problem}
+Despite the intuitive expectation that increasing the number of support examples should improve performance, the experimental evidence reveals that multi-shot settings do not consistently outperform one-shot configurations. This phenomenon, referred to as the \textit{multi-shot degradation problem}, arises when models fail to effectively aggregate information from structurally diverse support images. When the target object appears under significantly different poses, scales, or articulation states across support examples, naive aggregation strategies such as feature averaging can dilute discriminative semantic cues, leading to degraded segmentation accuracy.
+
+This limitation is particularly pronounced in large-vocabulary and fine-grained tasks, where intra-class variability is high. Existing approaches lack principled mechanisms for weighting or reconciling contradictory support evidence, resulting in unstable performance gains in 5-shot scenarios. Furthermore, computational overhead increases substantially with additional support examples, exacerbating latency issues. Techniques relying on probabilistic sampling (e.g., ProSAM) or graph construction and clustering (e.g., Bridge-the-Points) introduce significant processing bottlenecks, limiting applicability in real-time or high-frame-rate environments such as video segmentation and robotics.
+
+\subsection{Scalability and Efficiency Constraints}
+Another major research gap lies in the scalability of current methods to real-world deployment conditions. Many high-performing approaches rely on multi-stage reasoning, auxiliary modules, or iterative refinement, which significantly increase memory consumption and inference latency. While these strategies improve robustness on challenging datasets, they hinder deployment in resource-constrained settings. Achieving a balance between segmentation accuracy and computational efficiency remains an open challenge, particularly for applications requiring real-time processing.
+
+\subsection{Representation and Alignment Limitations}
+Although transformer-based encoders such as DINOv2 improve performance through stronger semantic representations, current frameworks still rely heavily on external alignment mechanisms to compensate for the lack of inherent semantic correspondence between support and query images. Developing models capable of intrinsic semantic alignment without complex auxiliary modules represents a critical direction for advancing reference-guided segmentation.
+
+\subsection{Promising Research Directions}
+Future research should explore adaptive mechanisms for aggregating multi-shot support information, including attention-based weighting schemes, uncertainty-aware fusion, and structure-preserving prototype learning. Integrating negative prompting directly into transformer attention maps offers a promising avenue for improving discriminative capability while reducing architectural complexity. 
+
+Additionally, Parameter-Efficient Fine-Tuning (PEFT) techniques—such as Low-Rank Adaptation (LoRA), Adapters, and Visual Prompt Tuning—applied selectively to foundation-model components present a viable alternative to fully frozen backbones. Such approaches could enable controlled adaptation to reference-guided tasks while preserving the generalization ability of the underlying model. 
+
+Finally, future frameworks should aim to unify strong semantic representations, efficient inference mechanisms, and adaptive reasoning strategies within a single architecture, thereby enabling robust performance across diverse datasets and deployment scenarios.
+
+
+\newpage
+
+
+% ==========================================
+% CHAPTER 16: CONCLUSION
+% ==========================================
+\section{Conclusion}
+
+Reference-guided few-shot segmentation with foundation models integrates example-based task specification with the powerful visual priors of large pre-trained models. This paradigm enables the segmentation of arbitrary objects with minimal supervision while maintaining strong generalization across categories, scenes, and domains.
+
+The progressive methodological evolution detailed in this report—from VRP-SAM's deterministic prompt generation to FCP-SAM's structured prototype reasoning, and Bridge-the-Points' robust graph topologies—demonstrates that the inherent architectural rigidity in foundation models can be successfully circumvented via advanced, mathematically rigorous conditioning mechanisms. By analyzing the trade-offs between probabilistic stability, feature correlation, and cyclic consistency, this study highlights that future robustness relies heavily on structural topological awareness and explicit negative prompting. This framework represents a significant step toward flexible and scalable visual perception systems capable of true open-world generalization.
+
+\newpage
+
+% ==========================================
+% APPENDICES
+% ==========================================
+\appendices
+
+\section{Implementation Details and Standard Hyperparameters}
+This appendix summarizes the common training configurations used across the evaluated SAM-based adaptation methods. Due to the frozen nature of the SAM backbone in most approaches, training is typically restricted to prompt conditioning modules and auxiliary adaptation components, while the foundation model parameters remain unchanged.
+
+\begin{table}[htbp]
+\centering
+\caption{Standard Hyperparameter Configurations for SAM Adaptation}
+\label{tab:hyperparams}
+\begin{tabular}{l l}
+\toprule
+\textbf{Parameter} & \textbf{Value/Configuration} \\
+\midrule
+Optimizer & AdamW \\
+Base Learning Rate & $1\times10^{-4}$ to $5\times10^{-5}$ \\
+Weight Decay & $1\times10^{-2}$ \\
+Batch Size & 8 to 16 \\
+Training Epochs & 50 \\
+Learning Rate Schedule & Cosine Annealing \\
+SAM Backbone & ViT-H (Frozen, unless specified) \\
+Auxiliary Backbone & ResNet-50 or DINOv2 (for feature alignment) \\
+Loss Function & Binary Cross-Entropy + Dice Loss \\
+Loss Weighting ($\lambda$) & 1.0 (BCE) + 1.0 (Dice) \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ==========================================
+% REFERENCES
+% ==========================================
+\begin{thebibliography}{10}
+
+\bibitem{kirillov2023segment}
+Kirillov, A., Mintun, E., Ravi, N., Mao, H., Rolland, C., Gustafson, L., ... \& Girshick, R. (2023). Segment anything. In \textit{Proceedings of the IEEE/CVF International Conference on Computer Vision} (pp. 4015-4026).
+
+\bibitem{he2016deep}
+He, K., Zhang, X., Ren, S., \& Sun, J. (2016). Deep residual learning for image recognition. In \textit{Proceedings of the IEEE conference on computer vision and pattern recognition} (pp. 770-778).
+
+\bibitem{oquab2023dinov2}
+Oquab, M., Darcet, T., Moutakanni, T., Vo, H., Szafraniec, M., Khalidov, V., ... \& Bojanowski, P. (2023). Dinov2: Learning robust visual features without supervision. \textit{arXiv preprint arXiv:2304.07193}.
+
+\bibitem{dosovitskiy2020image}
+Dosovitskiy, A., Beyer, L., Kolesnikov, A., Weissenborn, D., Zhai, X., Unterthiner, T., ... \& Houlsby, N. (2020). An image is worth 16x16 words: Transformers for image recognition at scale. \textit{International Conference on Learning Representations}.
+
+\bibitem{shaban2017one}
+Shaban, A., Bansal, S., Liu, Z., Essa, I., \& Boots, B. (2017). One-shot learning for semantic segmentation. In \textit{Proceedings of the British Machine Vision Conference (BMVC)}.
+
+\bibitem{nguyen2019feature}
+Nguyen, K., \& Todorovic, S. (2019). Feature weighting and boosting for few-shot segmentation. In \textit{Proceedings of the IEEE/CVF International Conference on Computer Vision} (pp. 622-631).
+
+\bibitem{everingham2010pascal}
+Everingham, M., Van Gool, L., Williams, C. K., Winn, J., \& Zisserman, A. (2010). The pascal visual object classes (voc) challenge. \textit{International journal of computer vision}, 88(2), 303-338.
+
+\bibitem{lin2014microsoft}
+Lin, T. Y., Maire, M., Belongie, S., Hays, J., Perona, P., Ramanan, D., ... \& Zitnick, C. L. (2014). Microsoft coco: Common objects in context. In \textit{European conference on computer vision} (pp. 740-755). Springer, Cham.
+
+\bibitem{li2020fss}
+Li, X., Wei, T., Chen, Y. P., Tai, Y.-W., \& Tang, C.-K. (2020). Fss-1000: A 1000-class dataset for few-shot segmentation. In \textit{Proceedings of the IEEE/CVF conference on computer vision and pattern recognition} (pp. 2869-2878).
+
+\bibitem{gupta2019lvis}
+Gupta, A., Dollar, P., \& Girshick, R. (2019). Lvis: A dataset for large vocabulary instance segmentation. In \textit{Proceedings of the IEEE/CVF conference on computer vision and pattern recognition} (pp. 5356-5364).
+
+\bibitem{chen2014detect}
+Chen, X., Mottaghi, R., Liu, X., Fidler, S., Urtasun, R., \& Yuille, A. (2014). Detect what you can: Detecting and representing objects using holistic models and body parts. In \textit{Proceedings of the IEEE conference on computer vision and pattern recognition} (pp. 1971-1978).
+
+\bibitem{ramanathan2023paco}
+Ramanathan, V., Kalia, A., Petrovic, V., Wen, Y., Zheng, B., Guo, B., ... \& Marquez, A. (2023). Paco: Parts and attributes of common objects. \textit{arXiv preprint arXiv:2301.01795}.
+
+\bibitem{wang2019panet}
+Wang, K., Liew, J. H., Zou, Y., Zhou, D., \& Feng, J. (2019). PANet: Few-shot image semantic segmentation with prototype alignment. In \textit{Proceedings of the IEEE/CVF International Conference on Computer Vision} (pp. 9197-9206).
+
+\bibitem{tian2020pfenet}
+Tian, Z., Zhao, H., Shu, M., Yang, Z., Li, R., \& Jia, J. (2020). Prior guided feature enrichment network for few-shot segmentation. \textit{IEEE Transactions on Pattern Analysis and Machine Intelligence}, 44(2), 1050-1065.
+
+\bibitem{sun2024vrp}
+Sun, Y., Chen, J., Zhang, S., Zhang, X., Chen, Q., Zhang, G., \& Li, Z. (2024).
+VRP-SAM: SAM with visual reference prompt.
+In \textit{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)} (pp. 23565--23574).
+
+\bibitem{wang2025prosam}
+Wang, X., Sebastian, C., He, W., \& Ren, L. (2025).
+ProSAM: Enhancing the robustness of SAM-based visual reference segmentation with probabilistic prompts.
+In \textit{Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)} (pp. 20487--20496).
+
+\bibitem{liu2023matcher}
+Liu, Y., Zhu, M., Li, H., Chen, H., Wang, X., \& Shen, C. (2023).
+Matcher: Segment anything with one shot using all-purpose feature matching.
+\textit{arXiv preprint arXiv:2305.13310}.
+
+\bibitem{qi2025dcsam}
+Qi, M., Zhu, P., Li, X., Bi, X., Qi, L., Ma, H., \& Yang, M. H. (2025).
+DC-SAM: In-context segment anything in images and videos via dual consistency.
+\textit{IEEE Transactions on Pattern Analysis and Machine Intelligence}.
+
+\bibitem{zhang2024bridge}
+Zhang, A., Gao, G., Jiao, J., Liu, C., \& Wei, Y. (2024).
+Bridge the points: Graph-based few-shot segment anything semantically.
+In \textit{Advances in Neural Information Processing Systems (NeurIPS)}, 37, 33232--33261.
+
+\bibitem{park2025fcpsam}
+Park, S., Lee, S., Seong, H. S., Yoo, J., \& Heo, J. P. (2025).
+Foreground-covering prototype generation and matching for SAM-aided few-shot segmentation.
+In \textit{Proceedings of the AAAI Conference on Artificial Intelligence}, 39(6), 6425--6433.
+
+
+\end{thebibliography}
+
+\end{document}
