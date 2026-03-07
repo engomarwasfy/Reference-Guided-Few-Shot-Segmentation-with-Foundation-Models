@@ -38,12 +38,12 @@
   \leavevmode%
   \hbox{%
   \begin{beamercolorbox}[wd=.33\paperwidth,ht=2.5ex,dp=1.125ex,center]{author in head/foot}%
-    \usebeamerfont{author in head/foot}\insertshortauthor
+    \usebeamerfont{author in head/foot}\textbf{\insertshortauthor}
   \end{beamercolorbox}%
-  \begin{beamercolorbox}[wd=.34\paperwidth,ht=2.5ex,dp=1.125ex,center]{title in head/foot}%
-    \usebeamerfont{title in head/foot}Alexandria University
+  \begin{beamercolorbox}[wd=.38\paperwidth,ht=2.5ex,dp=1.125ex,center]{title in head/foot}%
+    \usebeamerfont{title in head/foot}\textbf{Reference-Guided Few-Shot Segmentation with Foundation Models , 2026}
   \end{beamercolorbox}%
-  \begin{beamercolorbox}[wd=.33\paperwidth,ht=2.5ex,dp=1.125ex,right]{date in head/foot}%
+  \begin{beamercolorbox}[wd=.29\paperwidth,ht=2.5ex,dp=1.125ex,right]{date in head/foot}%
     \usebeamerfont{date in head/foot}\textbf{Page \insertframenumber{} of \inserttotalframenumber}\hspace*{2ex}
   \end{beamercolorbox}}%
   \vskip0pt%
@@ -51,13 +51,16 @@
 \makeatother
 
 \title[Few-Shot Image Segmentation]{Reference-Guided Few-Shot Segmentation with Foundation Models}
-\subtitle{PhD Main Specialization Exam}
-\author[Omar Wasfy]{Omar Wasfy}
+\subtitle{PhD Main Specialization Comprehensive Exam Submission}
+\author[Omar Ahmed Fouad Hassan Wasfy]{Omar Ahmed Fouad Hassan Wasfy}
 \institute[Alexandria University]{
-Computer and Systems Department, Faculty of Engineering\\
+Computer and Systems Engineering Department, Faculty of Engineering\\
  Alexandria University \\
- \vspace{0.3cm}
- \textbf{Supervisors:} Prof. Dr. Mohamed Ismail and Prof. Dr. Nagia Ghanem
+ \vspace{1cm}
+ \textbf{Supervisors: Prof. Dr. Mohamed Ismail and Prof. Dr. Nagia Ghanem}
+ \\
+ \vspace{0.5cm}
+ \textbf{2026}
 }
 \date{} 
 
@@ -207,24 +210,30 @@ Computer and Systems Department, Faculty of Engineering\\
 \section{Foundation Models \& SAM}
 
 % Slide 8
-\begin{frame}{The Segment Anything Model (SAM)}
-    \begin{columns}[c]
-        \begin{column}{0.45\textwidth}
-            \begin{block}{Architecture \cite{kirillov2023segment}}
-                \begin{itemize}
-                    \item \textbf{Image Encoder:} Heavy Vision Transformer (processes image to feature grid once).
-                    \item \textbf{Prompt Encoder:} Embeds spatial (points/boxes) and dense masks into the latent space.
-                    \item \textbf{Mask Decoder:} Highly efficient two-way transformer enabling real-time generation.
-                \end{itemize}
-            \end{block}
-        \end{column}
-        \begin{column}{0.55\textwidth}
-            \IfFileExists{SAM.png}{\includegraphics[width=1\linewidth, height=0.6\textheight, keepaspectratio]{SAM.png}}{\textbf{[Placeholder: SAM.png]}}
-        \end{column}
-    \end{columns}
+\begin{frame}{The Segment Anything Model (SAM) \textbf{(ICCV 2023)}}
+    % Top Section: Technical Description
+    \begin{block}{Architecture \cite{kirillov2023segment}}
+        \begin{itemize}
+            \item \textbf{Image Encoder:} MAE-pre-trained Vision Transformer (ViT) generating high-dimensional image embeddings.
+            \item \textbf{Prompt Encoder:} Positional encodings for points/boxes and convolutional layers for dense masks.
+            \item \textbf{Mask Decoder:} Lightweight transformer mapping image and prompt embeddings to valid segmentation masks.
+        \end{itemize}
+    \end{block}
+
+    \vfill % Adjusts vertical distribution
+
+    % Bottom Section: Full-Width Visualization
+    \centering
+    \IfFileExists{SAM.png}{
+        \includegraphics[width=\textwidth, height=0.45\textheight, keepaspectratio]{SAM.png}
+    }{
+        \begin{tikzpicture}
+            \draw[dashed] (0,0) rectangle (\textwidth, 3) node[pos=.5] {Placeholder: SAM.png (Full Width)};
+        \end{tikzpicture}
+    }
 \end{frame}
 
-% Slide 9
+% Slide 10
 \begin{frame}{The Semantic-Geometric Gap}
     \begin{block}{The Limitation of Scale (SA-1B Dataset)}
         SAM is trained on 1 billion high-quality masks, enforcing extreme geometric robustness. However, these masks are purely structural; they contain \textbf{no class or category labels}.
@@ -239,14 +248,29 @@ Computer and Systems Department, Faculty of Engineering\\
     \end{alertblock}
 \end{frame}
 
+
+% Slide 9: Qualitative Results
+\begin{frame}{SAM Manual Prompting vs. Reference-Guided Segmentation}
+    \begin{figure}[h]
+        \centering
+        \IfFileExists{VRP-SAM-1.png}{
+            \includegraphics[width=\textwidth, height=0.85\textheight, keepaspectratio]{VRP-SAM-1.png}
+        }{
+            \begin{tikzpicture}
+                \draw[dashed] (0,0) rectangle (\textwidth, 4) node[pos=.5] {Placeholder: VRP-SAM-1.png (Full Width)};
+            \end{tikzpicture}
+        }
+    \end{figure}
+\end{frame}
+
 % ==========================================
 % SECTION 5: ENHANCED METHODOLOGIES
 % ==========================================
 \section{Methodological Taxonomies}
 
 % --- VRP-SAM ---
-% Slide 10
-\begin{frame}{VRP-SAM: Prompt-Based Adaptation}
+% Slide 11
+\begin{frame}{VRP-SAM: Prompt-Based Adaptation \textbf{(CVPR 2024)}}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
             \begin{block}{Motivation \& Concept \cite{sun2024vrp}}
@@ -271,16 +295,16 @@ Computer and Systems Department, Faculty of Engineering\\
     \end{columns}
 \end{frame}
 
-% Slide 11
-\begin{frame}{VRP-SAM: Architecture}
+% Slide 12
+\begin{frame}{VRP-SAM: Architecture \textbf{(CVPR 2024)}}
     \begin{center}
         \IfFileExists{VRP-SAM-3.png}{\includegraphics[width=\textwidth, height=0.85\textheight, keepaspectratio]{VRP-SAM-3.png}}{\textbf{[Placeholder: VRP-SAM-3.png]}}
     \end{center}
 \end{frame}
 
 % --- PROSAM ---
-% Slide 12
-\begin{frame}{ProSAM: Probabilistic Prompting}
+% Slide 13
+\begin{frame}{ProSAM: Probabilistic Prompting \textbf{(ICCV 2025)}}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
             \begin{block}{Motivation \& Concept \cite{wang2025prosam}}
@@ -305,16 +329,16 @@ Computer and Systems Department, Faculty of Engineering\\
     \end{columns}
 \end{frame}
 
-% Slide 13
-\begin{frame}{ProSAM: Architecture}
+% Slide 14
+\begin{frame}{ProSAM: Architecture \textbf{(ICCV 2025)}}
     \begin{center}
         \IfFileExists{PRO-SAM-3.png}{\includegraphics[width=\textwidth, height=0.85\textheight, keepaspectratio]{PRO-SAM-3.png}}{\textbf{[Placeholder: PRO-SAM-3.png]}}
     \end{center}
 \end{frame}
 
 % --- MATCHER ---
-% Slide 14
-\begin{frame}{Matcher: Feature Matching Approaches}
+% Slide 15
+\begin{frame}{Matcher: Feature Matching Approaches\textbf{(IJCV 2025 \& ICLR 2024)}}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
             \begin{block}{Motivation \& Concept \cite{liu2023matcher}}
@@ -339,16 +363,16 @@ Computer and Systems Department, Faculty of Engineering\\
     \end{columns}
 \end{frame}
 
-% Slide 15
-\begin{frame}{Matcher: Architecture}
+% Slide 16
+\begin{frame}{Matcher: Architecture \textbf{(IJCV 2025 \& ICLR 2024)}}
     \begin{center}
         \IfFileExists{MATCHER-2.png}{\includegraphics[width=\textwidth, height=0.85\textheight, keepaspectratio]{MATCHER-2.png}}{\textbf{[Placeholder: MATCHER-2.png]}}
     \end{center}
 \end{frame}
 
 % --- DC-SAM ---
-% Slide 16
-\begin{frame}{DC-SAM: Consistency-Based Adaptation}
+% Slide 17
+\begin{frame}{DC-SAM: Consistency-Based Adaptation \textbf{(TPAMI 2025)}}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
             \begin{block}{Motivation \& Concept \cite{qi2025dcsam}}
@@ -373,16 +397,16 @@ Computer and Systems Department, Faculty of Engineering\\
     \end{columns}
 \end{frame}
 
-% Slide 17
-\begin{frame}{DC-SAM: Architecture}
+% Slide 18
+\begin{frame}{DC-SAM: Architecture \textbf{(TPAMI 2025)}}
     \begin{center}
         \IfFileExists{DC-SAM-2.png}{\includegraphics[width=\textwidth, height=0.85\textheight, keepaspectratio]{DC-SAM-2.png}}{\textbf{[Placeholder: DC-SAM-2.png]}}
     \end{center}
 \end{frame}
 
 % --- BRIDGE THE POINTS ---
-% Slide 18
-\begin{frame}{Bridge-the-Points: Graph-Based Reasoning}
+% Slide 19
+\begin{frame}{Bridge-the-Points: Graph-Based Reasoning \textbf{(NeurIPS 2024)}}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
             \begin{block}{Motivation \& Concept \cite{zhang2024bridge}}
@@ -407,16 +431,16 @@ Computer and Systems Department, Faculty of Engineering\\
     \end{columns}
 \end{frame}
 
-% Slide 19
-\begin{frame}{Bridge-the-Points: Architecture}
+% Slide 20
+\begin{frame}{Bridge-the-Points: Architecture \textbf{(NeurIPS 2024)}}
     \begin{center}
         \IfFileExists{BRIDGE-THE-POINTS-1.png}{\includegraphics[width=\textwidth, height=0.85\textheight, keepaspectratio]{BRIDGE-THE-POINTS-1.png}}{\textbf{[Placeholder: BRIDGE-THE-POINTS-1.png]}}
     \end{center}
 \end{frame}
 
 % --- FCP-SAM ---
-% Slide 20
-\begin{frame}{FCP-SAM: Prototype-Based Modeling}
+% Slide 21
+\begin{frame}{FCP-SAM: Prototype-Based Modeling \textbf{(AAAI 2025)}}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
             \begin{block}{Motivation \& Concept \cite{park2025fcpsam}}
@@ -441,11 +465,34 @@ Computer and Systems Department, Faculty of Engineering\\
     \end{columns}
 \end{frame}
 
-% Slide 21
-\begin{frame}{FCP-SAM: Architecture}
+% Slide 22
+\begin{frame}{FCP-SAM: Architecture \textbf{(AAAI 2025)}}
     \begin{center}
         \IfFileExists{FCP-SAM-2.png}{\includegraphics[width=\textwidth, height=0.80\textheight, keepaspectratio]{FCP-SAM-2.png}}{\textbf{[Placeholder: FCP-SAM-2.png]}}
     \end{center}
+\end{frame}
+
+% Slide 23
+
+\begin{frame}{Taxonomy of SAM-based Adaptation Strategies}
+    \begin{table}[htbp]
+    \centering
+    \caption{Classification of Representative Few-Shot SAM Adaptation Methods}
+    \renewcommand{\arraystretch}{1.3}
+    \small
+    \begin{tabular}{l p{0.6\linewidth}}
+    \toprule
+    \textbf{Paper} & \textbf{Adaptation Strategy} \\
+    \midrule
+    VRP-SAM (CVPR 2024) \cite{sun2024vrp} & Prompt-based adaptation \\
+    ProSAM (ICCV 2025) \cite{wang2025prosam} & Prompt-based adaptation (probabilistic prompting) \\
+    Matcher (IJCV 2025 / ICLR 2024) \cite{liu2023matcher} & Feature matching-based adaptation \\
+    DC-SAM (TPAMI 2025) \cite{qi2025dcsam} & Consistency-based adaptation \\
+    Bridge the Points (NeurIPS 2024) \cite{zhang2024bridge} & Graph-based reasoning \\
+    FCP-SAM (AAAI 2025) \cite{park2025fcpsam} & Prototype-based modeling \\
+    \bottomrule
+    \end{tabular}
+    \end{table}
 \end{frame}
 
 
@@ -454,7 +501,7 @@ Computer and Systems Department, Faculty of Engineering\\
 % ==========================================
 \section{Comparative Study \& Discussion}
 
-% Slide 22
+% Slide 24
 \begin{frame}{Evaluation Datasets: Standard Baselines}
     \begin{block}{PASCAL-$5^i$ \cite{shaban2017one}}
         \begin{itemize}
@@ -473,7 +520,7 @@ Computer and Systems Department, Faculty of Engineering\\
     \end{block}
 \end{frame}
 
-% Slide 23
+% Slide 25
 \begin{frame}{Evaluation Datasets: Large-Vocabulary Benchmarks}
     \begin{block}{FSS-1000 \cite{li2020fss}}
         \begin{itemize}
@@ -492,7 +539,7 @@ Computer and Systems Department, Faculty of Engineering\\
     \end{block}
 \end{frame}
 
-% Slide 24
+% Slide 26
 \begin{frame}{Evaluation Datasets: Part-Level Semantics}
     \begin{block}{PASCAL-Part \cite{chen2014detect}}
         \begin{itemize}
@@ -511,7 +558,7 @@ Computer and Systems Department, Faculty of Engineering\\
     \end{block}
 \end{frame}
 
-% Slide 25
+% Slide 27
 \begin{frame}{Overall Results: Standard \& Large-Vocabulary Datasets}
     \vspace{-0.1cm}
     \begin{table}[htbp]
@@ -541,7 +588,35 @@ Computer and Systems Department, Faculty of Engineering\\
     \end{table}
 \end{frame}
 
-% Slide 26
+% Slide 28
+\begin{frame}{Overall Results: Part-Level Semantics Datasets}
+\vspace{-0.2cm}
+
+\begin{table}[htbp]
+\centering
+\caption{Results (mIoU \%) on One-Shot Part Segmentation Datasets}
+\renewcommand{\arraystretch}{1.2}
+\small
+\begin{tabular}{l c c}
+\toprule
+\textbf{Method} & \textbf{PASCAL-Part (1-shot)} & \textbf{PACO-Part (1-shot)} \\
+\midrule
+Matcher \cite{liu2023matcher} & 42.9 & 34.7 \\
+Bridge-the-Points \cite{zhang2024bridge} & \textbf{44.5} & \textbf{36.3} \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\vspace{0.3cm}
+
+\begin{alertblock}{Key Observation}
+Part-level segmentation is significantly harder than whole-object segmentation.  
+Graph-based reasoning (\textbf{Bridge-the-Points}) achieves the best performance by modeling structural relationships between object regions.
+\end{alertblock}
+
+\end{frame}
+
+% Slide 29
 \begin{frame}{Discussion I: Semantic Alignment \& Negative Prompting}
     \begin{alertblock}{The Necessity of Semantic Alignment}
         \begin{itemize}
@@ -558,7 +633,10 @@ Computer and Systems Department, Faculty of Engineering\\
     \end{exampleblock}
 \end{frame}
 
-% Slide 27
+
+
+
+% Slide 30
 \begin{frame}{Discussion II: Dataset Behavior \& Part-Level Challenges}
     \begin{block}{Dataset-Dependent Vulnerabilities}
         \begin{itemize}
@@ -575,7 +653,7 @@ Computer and Systems Department, Faculty of Engineering\\
     \end{alertblock}
 \end{frame}
 
-% Slide 28
+% Slide 31
 \begin{frame}{Discussion III: The Impact of Representation Quality}
     \begin{table}[htbp]
     \centering
@@ -600,7 +678,7 @@ Computer and Systems Department, Faculty of Engineering\\
     \end{exampleblock}
 \end{frame}
 
-% Slide 29
+% Slide 32
 \begin{frame}{Discussion IV: Complexity Trade-Offs \& Limitations}
     \begin{block}{Robustness vs. Scalability Tension}
         \begin{itemize}
@@ -623,7 +701,7 @@ Computer and Systems Department, Faculty of Engineering\\
 % ==========================================
 \section{Research Gaps \& Conclusion}
 
-% Slide 30
+% Slide 33
 \begin{frame}{Research Gap I: The Multi-Shot Degradation Problem}
     \begin{alertblock}{The Failure of Naive Aggregation}
         \begin{itemize}
@@ -634,7 +712,7 @@ Computer and Systems Department, Faculty of Engineering\\
     \end{alertblock}
 \end{frame}
 
-% Slide 31
+% Slide 34
 \begin{frame}{Research Gaps II: Scalability and Alignment}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
@@ -657,7 +735,7 @@ Computer and Systems Department, Faculty of Engineering\\
     \end{columns}
 \end{frame}
 
-% Slide 32
+% Slide 35
 \begin{frame}{Promising Future Directions}
     Future algorithmic development must focus on unifying strong semantic representations with highly efficient inference mechanisms:
     
@@ -675,7 +753,7 @@ Computer and Systems Department, Faculty of Engineering\\
     \end{block}
 \end{frame}
 
-% Slide 33
+% Slide 36
 \begin{frame}{Conclusion}
     \begin{exampleblock}{The Trajectory of Visual Perception}
         \begin{itemize}
@@ -685,6 +763,9 @@ Computer and Systems Department, Faculty of Engineering\\
         \end{itemize}
     \end{exampleblock}
 \end{frame}
+
+
+
 
 % ==========================================
 % REFERENCES
@@ -768,13 +849,20 @@ In \textit{Proceedings of the AAAI Conference on Artificial Intelligence}, 39(6)
     \end{thebibliography}
 \end{frame}
 
-% Slide 35 (Thank You Slide)
+
+% Slide 37 (Thank You Slide)
 \begin{frame}
-    \centering
+    \frametitle{Thank You}
     \vfill
-    \Huge
-    \textbf{Thank You}
+    \centering
+    \includegraphics[width=1\linewidth,height=0.79\textheight,keepaspectratio]{thankyou.png}
+    
+    \begin{flushright}
+        \tiny\textbf{Email: omar.wasfy@alexu.edu.eg}
+    \end{flushright}
     \vfill
 \end{frame}
+
+
 
 \end{document}

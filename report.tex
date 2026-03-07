@@ -41,6 +41,22 @@
     linktoc=all,     %set to all if you want both sections and subsections linked
 }
 
+% 1. Fix for IEEEtran + titlesec compatibility
+\newcommand{\subparagraph}{}
+
+% 2. Now load the package
+\usepackage{titlesec}
+
+% 3. Apply your bold overrides (Left-Aligned)
+\titleformat{\section}
+  {\normalfont\Large\bfseries}{\thesection.}{1em}{\uppercase}
+
+\titleformat{\subsection}
+  {\normalfont\large\bfseries}{\thesubsection.}{1em}{}
+
+\titleformat{\subsubsection}
+  {\normalfont\normalsize\bfseries}{\thesubsubsection)}{1em}{}
+
 % --- NEW CONFIGURATION FOR SECTION & TABLE NUMBERING ---
 % 1. Change the underlying counters to Arabic
 \renewcommand{\thesection}{\arabic{section}}
@@ -59,17 +75,17 @@
 
 \begin{figure}[htbp]
     \centering
-    \begin{subfigure}[b]{0.30\textwidth}
-        \centering
+    \begin{subfigure}[t]{0.45\textwidth}
+        \flushleft
         \IfFileExists{Alexandria_university.png}{%
             \includegraphics[height=3cm]{Alexandria_university.png}%
         }{%
             \framebox[3cm]{\rule{0pt}{3cm} AU Logo}%
         }
-    \end{subfigure}%
-    \hspace{2cm} % Space between logos
-    \begin{subfigure}[b]{0.30\textwidth}
-        \centering
+    \end{subfigure}
+    \hfill
+    \begin{subfigure}[t]{0.45\textwidth}
+        \flushright
         \IfFileExists{faculty_of_engineering.jpeg}{%
             \includegraphics[height=3cm]{faculty_of_engineering.jpeg}%
         }{%
@@ -78,8 +94,7 @@
     \end{subfigure}
     
     \vspace{0.5cm}
-    \par\noindent % Safely forces a new line to push the rule below the images
-    \rule{\textwidth}{0.4pt}
+    \hrule height 0.4pt width \textwidth
 \end{figure}
 
 \begin{center}
@@ -92,10 +107,17 @@ Faculty of Engineering\\
 \begin{center}
     {\Large \textbf{Reference-Guided Few-Shot Segmentation with Foundation Models}} \\ 
     \vspace{0.5cm}
-    {\large \textbf{PhD Main Specialization Exam Submission}}
+    {\large \textbf{PhD Main Specialization Comprehensive Exam Submission}}
 \end{center}
 
-\vspace{1cm}
+\begin{center}
+    In\\
+    \vspace{0.5cm}
+    {\large \textbf{Computer and Systems Engineering}}\\
+\end{center}
+
+\vspace{0.1cm}
+
 
 \begin{center}
     Presented by\\
@@ -103,7 +125,7 @@ Faculty of Engineering\\
     {\large \textbf{Omar Ahmed Fouad Hassan Wasfy}}\\
 \end{center}
 
-\vspace{1cm}
+\vspace{0.1cm}
 
 \begin{center}
     {\small \textbf{B.Sc. in Computer and Systems Engineering  \\
@@ -118,13 +140,13 @@ Faculty of Engineering\\
 \vspace{1cm}
 
 \begin{center}
-    \textbf{Supervisors:} Prof. Dr. Mohamed Ismail and Prof. Dr. Nagia Ghanem
+    \textbf{Supervisors: Prof. Dr. Mohamed Ismail and Prof. Dr. Nagia Ghanem}
 \end{center}
 
 \vfill % Pushes the date to the bottom of the page
 
 \begin{center}
-    2026
+   \textbf{2026}
 \end{center}
 
 \normalsize
@@ -139,13 +161,25 @@ Reference-guided few-shot segmentation with foundation models extends conditiona
 \tableofcontents
 \newpage
 
+% --- List of Figures ---
+\cleardoublepage % Ensures the anchor starts on the correct page
+\phantomsection 
+\addcontentsline{toc}{section}{List of Figures}
 \listoffigures
 \vspace{2em}
+
+% --- List of Tables ---
+\cleardoublepage
+\phantomsection
+\addcontentsline{toc}{section}{List of Tables}
 \listoftables
 \vspace{2em}
 
-\section*{List of Abbreviations}
+% --- List of Abbreviations ---
+\cleardoublepage
+\phantomsection
 \addcontentsline{toc}{section}{List of Abbreviations}
+\section*{List of Abbreviations}
 \begin{IEEEdescription}[\IEEEsetlabelwidth{PASCAL-Part}]
     \item[BCE] Binary Cross-Entropy
     \item[CNN] Convolutional Neural Network
@@ -205,6 +239,23 @@ The primary contributions of this synthesis are:
     \item A critical synthesis of empirical results across 6 distinct datasets, explicitly correlating mIoU performance with dataset complexity in 1-shot and 5-shot configurations.
     \item The identification of systemic failure modes related to scale variation, prompt sensitivity, and dense multi-instance clutter, paving the way for future algorithmic interventions.
 \end{itemize}
+
+\subsection{Report Structure}
+The remainder of this report is organized as follows:
+
+\begin{itemize}
+    \item \textbf{Section 2: Background and Related Work:} Provides a comprehensive overview of the evolution of semantic segmentation and the rise of vision foundation models.
+    \item \textbf{Section 3: Problem Formulation:} Establishes the mathematical framework, task definitions, and the episodic paradigm for few-shot segmentation.
+    \item \textbf{Section 4: Applications:} Outlines the practical implementation of reference-guided models in diverse industrial and scientific domains.
+    \item \textbf{Section 5: Foundation Models and SAM:} Details the architectural components of the Segment Anything Model and the challenges of the semantic-geometric gap.
+    \item \textbf{Section 6: Methodological Taxonomy:} Introduces the formalized six-tier taxonomy used to categorize the contemporary literature.
+    \item \textbf{Sections 7 to 12: Technical Analysis of Methodologies:} Provide a detailed analysis of the specific approaches: VRP-SAM, ProSAM, Matcher, DC-SAM, Bridge-the-Points, and FCP-SAM.
+    \item \textbf{Section 13: Quantitative Results and Comparative Study:} Presents a rigorous synthesis of empirical performance across six major benchmarks.
+    \item \textbf{Section 14: Discussion:} Evaluates the technical trade-offs between representation quality, robustness, and computational efficiency.
+    \item \textbf{Section 15: Research Gaps and Future Directions:} Identifies critical bottlenecks, such as the multi-shot degradation problem, and outlines trajectories for future development.
+    \item \textbf{Section 16: Conclusion:} Summarizes the foundational insights and provides a final synthesis of the study.
+\end{itemize}
+ 
 
 \newpage
 
@@ -326,7 +377,9 @@ Reference-guided few-shot segmentation enables adaptive perception in scenarios 
 The Segment Anything Model (SAM) is arguably the most prominent vision foundation model developed to date. It is designed to perform class-agnostic segmentation and consists of three highly optimized, distinct core components:
 
 1. \textbf{Image Encoder:} A Masked Autoencoder (MAE) pre-trained Vision Transformer (typically ViT-H, containing 632 million parameters) that processes high-resolution inputs ($1024 \times 1024$) into a compact, highly expressive feature grid ($64 \times 64 \times 256$). This encoder is computationally heavy and represents the primary latency bottleneck of the model; however, it only needs to run once per image.
+\\
 2. \textbf{Prompt Encoder:} A lightweight module that embeds spatial prompts (points, bounding boxes, dense masks) and textual prompts into the 256-dimensional latent space.
+\\
 3. \textbf{Mask Decoder:} A highly efficient, lightweight two-way transformer block that iteratively updates image embeddings and prompt embeddings via bidirectional cross-attention, ultimately outputting multi-scale mask predictions.
 
 \begin{figure}[htbp]
