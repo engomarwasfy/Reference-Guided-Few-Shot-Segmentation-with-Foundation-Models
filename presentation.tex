@@ -51,7 +51,7 @@
 \makeatother
 
 \title[Few-Shot Image Segmentation]{Reference-Guided Few-Shot Segmentation with Foundation Models}
-\subtitle{PhD Main Specialization Comprehensive Exam Submission}
+%\subtitle{PhD Research Proposal}
 \author[Omar Ahmed Fouad Hassan Wasfy]{Omar Ahmed Fouad Hassan Wasfy}
 \institute[Alexandria University]{
 Computer and Systems Engineering Department, Faculty of Engineering\\
@@ -76,29 +76,76 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
  \tableofcontents[hideallsubsections]
 \end{frame}
 
+
 % ==========================================
 % SECTION 1: INTRODUCTION & BACKGROUND
 % ==========================================
 \section{Introduction \& Background}
 
+
+% Slide X
+\begin{frame}{Top-Tier Venues Referenced in This Presentation}
+
+\begin{columns}[T]
+    \begin{column}{0.48\textwidth}
+        \begin{block}{Computer Vision}
+            \begin{itemize}
+                \item \textbf{CVPR} \\ \small IEEE/CVF Conference on Computer Vision and Pattern Recognition
+                \item \textbf{ICCV} \\ \small IEEE/CVF International Conference on Computer Vision
+                \item \textbf{IJCV} \\ \small International Journal of Computer Vision
+                \item \textbf{TPAMI} \\ \small IEEE Transactions on Pattern Analysis and Machine Intelligence
+            \end{itemize}
+        \end{block}
+    \end{column}
+
+    \begin{column}{0.48\textwidth}
+        \begin{block}{Machine Learning / AI}
+            \begin{itemize}
+                \item \textbf{ICLR} \\ \small International Conference on Learning Representations
+                \item \textbf{NeurIPS} \\ \small Conference on Neural Information Processing Systems
+                \item \textbf{AAAI} \\ \small AAAI Conference on Artificial Intelligence\\
+                \hspace{0.5cm}\scriptsize (Association for the Advancement of Artificial Intelligence)
+            \end{itemize}
+        \end{block}
+    \end{column}
+\end{columns}
+
+\vspace{0.3cm}
+\centering
+\footnotesize The listed venues comprise top-tier (A*) conferences and high-impact journals in Computer Vision and Machine Learning.
+\end{frame}
+
 % Slide 3
-\begin{frame}{From Closed-Set to Few-Shot Segmentation}
+\begin{frame}{From Closed-Set \& Zero-Shot to Few-Shot Segmentation}
     \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \begin{alertblock}{Limitations of Closed-Set}
+        \begin{column}{0.32\textwidth}
+            \begin{alertblock}{Closed-Set Segmentation}
                 \begin{itemize}
-                    \item Relies on optimizing parameters for a \textbf{fixed, predefined} set of categories.
-                    \item Suffers catastrophic degradation on out-of-distribution objects.
-                    \item Exhaustive pixel-level annotation for every novel class is prohibitively expensive.
+                    \item Trained on a \textbf{fixed, predefined} label space.
+                    \item Requires \textbf{large-scale pixel-level annotations}.
+                    \item \textbf{Limited generalization} to unseen object classes.
                 \end{itemize}
             \end{alertblock}
         \end{column}
-        
-        \begin{column}{0.48\textwidth}
-            \begin{exampleblock}{The Few-Shot Paradigm}
+
+        \begin{column}{0.32\textwidth}
+            \begin{block}{Zero-Shot Segmentation}
                 \begin{itemize}
-                    \item Adapts to unseen, novel classes using a minimal support set (typically 1 to 5 images) \cite{shaban2017one}.
-                    \item \textbf{The Optimal Middle Ground:} Avoids the heavy data requirements of supervised learning, while providing the highly localized precision lacking in zero-shot learning.
+                    \item Transfers knowledge via \textbf{semantic priors} (e.g., \textit{text prompts}).
+                    \item Utilizes \textbf{geometric prompts} (e.g., points, boxes).
+                    \item Requires \textbf{no task-specific annotations}.
+                    \item \textbf{Weak spatial precision} (coarse masks).
+                \end{itemize}
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.32\textwidth}
+            \begin{exampleblock}{Few-Shot Segmentation}
+                \begin{itemize}
+                    \item Adapts using \textbf{few labeled examples} (1--5 images) \cite{shaban2017one}.
+                    \item Learns \textbf{class-specific representations} from support data.
+                    \item \textbf{Accurate pixel-level localization}.
+                    \item \textbf{Middle Ground:} balances generalization and supervision.
                 \end{itemize}
             \end{exampleblock}
         \end{column}
@@ -136,7 +183,7 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
 \section{Problem Formulation}
 
 % Slide 5
-\begin{frame}{Reference-Guided Segmentation \& System Setup}
+\begin{frame}{Reference-Guided Few-Shot Segmentation \& System Setup}
     \begin{block}{Task Definition: Open-Set Generalization}
         A conditional dense prediction task aiming to delineate a target object in a query image, guided strictly by a small set of annotated reference examples. It operates \textbf{class-agnostic}, relying entirely on visual patterns rather than predefined text labels.
     \end{block}
@@ -145,8 +192,8 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
         \begin{column}{0.48\textwidth}
             \textbf{Inputs}
             \begin{itemize}
-                \item \textbf{Support Set:} A few images pairing the target object with a pixel-level spatial mask.
-                \item \textbf{Query Image:} Unlabeled target environment containing complex scenes and novel conditions.
+                \item \textbf{Support Set (Reference Set):} A few images pairing the target object with a pixel-level spatial mask.
+                \item \textbf{Query Image (Target Image):} Unlabeled target environment containing complex scenes and novel conditions.
             \end{itemize}
         \end{column}
         \begin{column}{0.48\textwidth}
@@ -161,7 +208,7 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
 
 % Slide 6
 \begin{frame}{Core Technical Challenges}
-    Adapting generic foundation models to FSS introduces severe mathematical bottlenecks:
+    Adapting generic foundation models to Few-Shot Segmentation introduces severe mathematical bottlenecks:
     
     \begin{alertblock}{The Adaptation Challenges}
         \begin{itemize}
@@ -214,7 +261,7 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
     % Top Section: Technical Description
     \begin{block}{Architecture \cite{kirillov2023segment}}
         \begin{itemize}
-            \item \textbf{Image Encoder:} MAE-pre-trained Vision Transformer (ViT) generating high-dimensional image embeddings.
+            \item \textbf{Image Encoder:} Masked Autoeconder (MAE) pre-trained Vision Transformer (ViT) generating high-dimensional image embeddings.
             \item \textbf{Prompt Encoder:} Positional encodings for points/boxes and convolutional layers for dense masks.
             \item \textbf{Mask Decoder:} Lightweight transformer mapping image and prompt embeddings to valid segmentation masks.
         \end{itemize}
@@ -263,14 +310,41 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
     \end{figure}
 \end{frame}
 
+
 % ==========================================
 % SECTION 5: ENHANCED METHODOLOGIES
 % ==========================================
 \section{Methodological Taxonomies}
 
+% Slide 10
+
+\begin{frame}{Taxonomy of SAM-based Adaptation Strategies}
+    \begin{table}[htbp]
+    \centering
+    \caption{Classification of Representative Few-Shot SAM Adaptation Methods}
+    \renewcommand{\arraystretch}{1.3}
+    \small
+    \begin{tabular}{l p{0.6\linewidth}}
+    \toprule
+    \textbf{Paper} & \textbf{Adaptation Strategy} \\
+    \midrule
+    VRP-SAM (CVPR 2024) \cite{sun2024vrp} & Prompt-based adaptation \\
+    ProSAM (ICCV 2025) \cite{wang2025prosam} & Prompt-based adaptation (probabilistic prompting) \\
+    Matcher (IJCV 2025 / ICLR 2024) \cite{liu2023matcher} & Feature matching-based adaptation \\
+    DC-SAM (TPAMI 2025) \cite{qi2025dcsam} & Consistency-based adaptation \\
+    Bridge the Points (NeurIPS 2024) \cite{zhang2024bridge} & Graph-based reasoning \\
+    FCP-SAM (AAAI 2025) \cite{park2025fcpsam} & Prototype-based modeling \\
+    \bottomrule
+    \end{tabular}
+    \end{table}
+\end{frame}
+
+
+
 % --- VRP-SAM ---
 % Slide 11
 \begin{frame}{VRP-SAM: Prompt-Based Adaptation \textbf{(CVPR 2024)}}
+\textit{VRP-SAM: SAM with visual reference prompt.}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
             \begin{block}{Motivation \& Concept \cite{sun2024vrp}}
@@ -305,6 +379,7 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
 % --- PROSAM ---
 % Slide 13
 \begin{frame}{ProSAM: Probabilistic Prompting \textbf{(ICCV 2025)}}
+\textit{ProSAM: Enhancing the robustness of SAM-based visual reference segmentation with probabilistic prompts.}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
             \begin{block}{Motivation \& Concept \cite{wang2025prosam}}
@@ -338,7 +413,8 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
 
 % --- MATCHER ---
 % Slide 15
-\begin{frame}{Matcher: Feature Matching Approaches\textbf{(IJCV 2025 \& ICLR 2024)}}
+\begin{frame}{Matcher: Feature Matching Approach \textbf{(IJCV 2025 \& ICLR 2024)}}
+\textit{Matcher: Segment anything with one shot using all-purpose feature matching.}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
             \begin{block}{Motivation \& Concept \cite{liu2023matcher}}
@@ -373,6 +449,7 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
 % --- DC-SAM ---
 % Slide 17
 \begin{frame}{DC-SAM: Consistency-Based Adaptation \textbf{(TPAMI 2025)}}
+\textit{DC-SAM: In-context segment anything in images and videos via dual consistency.}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
             \begin{block}{Motivation \& Concept \cite{qi2025dcsam}}
@@ -407,6 +484,9 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
 % --- BRIDGE THE POINTS ---
 % Slide 19
 \begin{frame}{Bridge-the-Points: Graph-Based Reasoning \textbf{(NeurIPS 2024)}}
+
+\textit{Bridge the points: Graph-based few-shot segment anything semantically.}
+
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
             \begin{block}{Motivation \& Concept \cite{zhang2024bridge}}
@@ -423,8 +503,8 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
             \end{exampleblock}
             \begin{alertblock}{Limitations}
                 \begin{itemize}
-                    \item[\textcolor{red}{\ding{55}}] Graph traversal exhibits quadratic time complexity $\mathcal{O}(|\mathcal{V}|^2)$.
-                    \item[\textcolor{red}{\ding{55}}] Introduces massive latency bottlenecks for high-res images.
+                    \item[\textcolor{red}{\ding{55}}] Graph traversal exhibits quadratic time complexity in worst case $\mathcal{O}(|\mathcal{V}|^2)$.
+                    \item[\textcolor{red}{\ding{55}}] Introduces massive latency bottlenecks for high resolution images.
                 \end{itemize}
             \end{alertblock}
         \end{column}
@@ -441,6 +521,8 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
 % --- FCP-SAM ---
 % Slide 21
 \begin{frame}{FCP-SAM: Prototype-Based Modeling \textbf{(AAAI 2025)}}
+
+\textit{Foreground-covering prototype generation and matching for SAM-aided few-shot segmentation.}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
             \begin{block}{Motivation \& Concept \cite{park2025fcpsam}}
@@ -472,28 +554,7 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
     \end{center}
 \end{frame}
 
-% Slide 23
 
-\begin{frame}{Taxonomy of SAM-based Adaptation Strategies}
-    \begin{table}[htbp]
-    \centering
-    \caption{Classification of Representative Few-Shot SAM Adaptation Methods}
-    \renewcommand{\arraystretch}{1.3}
-    \small
-    \begin{tabular}{l p{0.6\linewidth}}
-    \toprule
-    \textbf{Paper} & \textbf{Adaptation Strategy} \\
-    \midrule
-    VRP-SAM (CVPR 2024) \cite{sun2024vrp} & Prompt-based adaptation \\
-    ProSAM (ICCV 2025) \cite{wang2025prosam} & Prompt-based adaptation (probabilistic prompting) \\
-    Matcher (IJCV 2025 / ICLR 2024) \cite{liu2023matcher} & Feature matching-based adaptation \\
-    DC-SAM (TPAMI 2025) \cite{qi2025dcsam} & Consistency-based adaptation \\
-    Bridge the Points (NeurIPS 2024) \cite{zhang2024bridge} & Graph-based reasoning \\
-    FCP-SAM (AAAI 2025) \cite{park2025fcpsam} & Prototype-based modeling \\
-    \bottomrule
-    \end{tabular}
-    \end{table}
-\end{frame}
 
 
 % ==========================================
@@ -678,20 +739,28 @@ Graph-based reasoning (\textbf{Bridge-the-Points}) achieves the best performance
     \end{exampleblock}
 \end{frame}
 
-% Slide 32
-\begin{frame}{Discussion IV: Complexity Trade-Offs \& Limitations}
-    \begin{block}{Robustness vs. Scalability Tension}
-        \begin{itemize}
-            \item \textbf{Real-Time Efficiency:} Lightweight, single-pass methods (\textcolor{teal}{VRP-SAM}) are fast but suffer severe fragmentation in complex scenarios.
-            \item \textbf{High Robustness, High Cost:} Multi-stage reasoning (\textcolor{teal}{DC-SAM, FCP-SAM}) achieves higher robustness but incurs massive increases in memory and latency.
-            \item \textbf{The Graph Bottleneck:} Structural graph traversal (\textcolor{teal}{Bridge-the-Points}) scales poorly with quadratic $\mathcal{O}(|\mathcal{V}|^2)$ complexity.
-        \end{itemize}
-    \end{block}
+
+\begin{frame}{Discussion IV: Complexity Trade-Offs}
+\begin{itemize}
+\item \textbf{Real-Time Efficiency:} Lightweight, single-pass methods (\textcolor{teal}{VRP-SAM}) are fast but prone to fragmentation in complex scenes.
+
+    \item \textbf{Intermediate Complexity:} Cross-image feature alignment (\textcolor{teal}{Matcher}) introduces additional cost due to dense support-query interactions.
     
-    \begin{alertblock}{Systemic Model Limitations}
+    \item \textbf{Probabilistic Prompting:} Modeling prompt uncertainty (\textcolor{teal}{ProSAM}) improves robustness in ambiguous regions, at the cost of iterative sampling and increased inference time.
+    
+    \item \textbf{High Robustness, Higher Cost:} Multi-stage reasoning (\textcolor{teal}{DC-SAM, FCP-SAM}) improves robustness at the expense of increased memory and latency.
+    
+    \item \textbf{Graph Bottleneck:} Structural graph-based methods (\textcolor{teal}{Bridge-the-Points}) scale poorly with worst case $\mathcal{O}(|\mathcal{V}|^2)$ complexity.
+\end{itemize}
+
+\end{frame}
+
+\begin{frame}{Discussion V: Systemic Limitations}
+    \begin{alertblock}{Key Limitations}
         \begin{itemize}
-            \item \textbf{Auxiliary Reliance:} Heavy dependence on heavily parameterized auxiliary backbones (e.g., ResNet) compromises pure foundation pipeline elegance.
-            \item \textbf{Annotation Sensitivity:} Architectures implicitly assume pristine, noise-free support masks, failing unpredictably if human references are flawed.
+            \item \textbf{Auxiliary Backbone Dependence:} Reliance on heavily parameterized networks (e.g., ResNet) increases computational burden and reduces architectural simplicity.
+            
+            \item \textbf{Annotation Sensitivity:} Performance degrades under noisy or imprecise support masks.
         \end{itemize}
     \end{alertblock}
 \end{frame}
@@ -707,7 +776,6 @@ Graph-based reasoning (\textbf{Bridge-the-Points}) achieves the best performance
         \begin{itemize}
             \item Despite the intuitive expectation that more references equal better performance, $K$-shot settings ($K=5$) \textbf{do not} consistently outperform 1-shot configurations.
             \item If the target object exhibits severe pose, scale, or articulation changes across the 5 support examples, naive feature averaging mathematically dilutes discriminative cues.
-            \item \textbf{Current Void:} Existing architectures lack principled mechanisms for evidence reconciliation and adaptive structural weighting across diverse visual inputs.
         \end{itemize}
     \end{alertblock}
 \end{frame}
@@ -757,7 +825,7 @@ Graph-based reasoning (\textbf{Bridge-the-Points}) achieves the best performance
 \begin{frame}{Conclusion}
     \begin{exampleblock}{The Trajectory of Visual Perception}
         \begin{itemize}
-            \item Reference-guided FSS successfully integrates example-based task specification with the powerful, zero-shot geometric priors of massive foundation models.
+            \item Reference-guided Few-Shot Segmentation (FSS) successfully integrates example-based task specification with the powerful, zero-shot geometric priors of massive foundation models.
             \item The inherent architectural rigidity in networks like SAM can be successfully circumvented via mathematically rigorous, multi-stage conditioning algorithms.
             \item Moving forward, robust open-world generalization will rely heavily on \textbf{topological structural awareness} and the explicit mathematical modeling of \textbf{negative background context}.
         \end{itemize}

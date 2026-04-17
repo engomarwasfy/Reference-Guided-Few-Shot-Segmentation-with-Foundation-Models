@@ -1,0 +1,176 @@
+\documentclass[journal,12pt,onecolumn,draftclsnofoot]{IEEEtran}
+
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{algorithm}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{geometry}
+\usepackage{booktabs}
+\usepackage{multirow}
+\usepackage{bm}
+\usepackage{subcaption}
+\usepackage{fancyhdr}
+\usepackage{lastpage}
+\usepackage{titlesec}
+\usepackage{enumitem}
+
+% Standard thesis formatting: 1.5 line spacing
+\linespread{1.0824}
+
+\geometry{a4paper, margin=1in}
+
+% Footer configuration
+\pagestyle{fancy}
+\fancyhf{}
+\renewcommand{\headrulewidth}{0pt}
+\fancyfoot[C]{\thepage\ of \pageref{LastPage}}
+
+\fancypagestyle{plain}{
+    \fancyhf{}
+    \renewcommand{\headrulewidth}{0pt}
+    \fancyfoot[C]{\thepage\ of \pageref{LastPage}}
+}
+
+\hypersetup{
+    colorlinks=true,
+    linkcolor=black,
+    urlcolor=blue,
+    citecolor=green,
+    linktoc=all,
+}
+
+% Section formatting - Strict Title Case, Compressed vertical spacing
+\newcommand{\subparagraph}{}
+\titleformat{\section}{\normalfont\Large\bfseries}{\thesection}{1em}{}
+\titleformat{\subsection}{\normalfont\large\bfseries}{\thesubsection}{1em}{}
+\titleformat{\subsubsection}{\normalfont\normalsize\bfseries}{\thesubsubsection}{1em}{}
+\titlespacing*{\section}{0pt}{1.5ex plus 1ex minus .2ex}{1ex plus .2ex}
+
+% Numbering configuration
+\renewcommand{\thesection}{\arabic{section}}
+\renewcommand{\thesubsection}{\thesection.\arabic{subsection}}
+\renewcommand{\thesubsubsection}{\thesubsection.\arabic{subsubsection}}
+\renewcommand{\thetable}{\arabic{table}}
+
+\makeatletter
+\renewcommand{\thesectiondis}{\thesection\quad}
+\renewcommand{\thesubsectiondis}{\thesubsection\quad}
+\renewcommand{\thesubsubsectiondis}{\thesubsubsection\quad}
+\makeatother
+
+\begin{document}
+
+\begin{center}
+    {\Huge \textbf{Research Proposal}} \\[1em]
+    {\LARGE Reference-Guided Few-Shot Segmentation with Foundation Models} \\[1.5em]
+    {\large \textbf{Omar Ahmed Fouad Hassan Wasfy}} \\[1em]
+    {\large Under supervision of:} \\[0.5em]
+    {\large \textbf{Prof. Dr. Mohamed Ismail}} \\
+    {\large \textbf{Prof. Dr. Nagia Ghanem}}
+\end{center}
+
+\vspace{1.5em}
+
+\section*{Abstract}
+\normalsize
+Reference-guided few-shot segmentation constitutes a pivotal frontier in computer vision, facilitating open-world visual perception without the prerequisite of exhaustive dense annotation. While large-scale vision foundation models provide exceptionally robust zero-shot geometric priors, their direct transferability to specific, reference-guided semantic tasks is constrained by a fundamental semantic-geometric gap. This research proposes a comprehensive methodological framework to adapt frozen foundation models for few-shot scenarios. By investigating advanced feature alignment techniques, parameter-efficient optimization, and structural graph-based reasoning, this research aims to explore methods that mitigate systemic vulnerabilities such as distractor interference, moving toward more scalable and controllable segmentation architectures.
+
+\section{Introduction and Motivation}
+
+The paradigm of semantic segmentation relies predominantly on supervised learning frameworks that necessitate massive, densely annotated datasets. This closed-set approach inherently lacks the structural plasticity required for dynamic generalization to novel, out-of-distribution object categories. Reference-guided few-shot segmentation bypasses this limitation. At its core, the objective of this task is to accurately segment a novel object category within a new scene, guided strictly by a minimal number of annotated examples.
+
+Formally, this is defined as a conditional dense prediction task structured around the following explicit parameters:
+
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item \textbf{Task Objective:} To dynamically delineate the spatial boundaries of a target object class in an unseen environment, transferring semantic knowledge from reference examples rather than relying on predefined, pre-trained category labels.
+
+    \item \textbf{Input:} The system receives two components: (1) a \textit{Support Set} consisting of $K$ reference images paired with their exact ground-truth binary masks, providing the explicit visual definition of the target class, and (2) an unlabeled \textit{Query Image} containing the target object amidst background context.
+
+    \item \textbf{Output:} The model generates a dense pixel-level prediction over the Query Image, culminating in a precise binary mask that isolates the target object from the background and any visually similar distractors.
+\end{itemize}
+
+Recent advancements in vision foundation models, such as the Segment Anything Model (SAM), have significantly improved zero-shot geometric feature extraction. However, translating these generalized spatial capabilities into precise, reference-guided semantic alignment introduces several practical bottlenecks:
+
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item \textbf{The Semantic-Geometric Gap:} Generic foundation features often struggle to capture the highly specific semantic intent conveyed by a support image-mask pair.
+
+    \item \textbf{Contextual Brittleness:} Models remain susceptible to visual hallucinations and false-positive delineations in multi-instance, densely cluttered spatial environments.
+\end{itemize}
+
+Investigating approaches to alleviate these limitations is an important step toward realizing more efficient, class-agnostic, open-world visual perception systems.
+
+\section{Background and Literature Review}
+
+The trajectory of dense prediction models has evolved from localized, closed-set Convolutional Neural Networks to global, open-vocabulary Vision Transformers. The introduction of self-supervised learning on extensive unannotated datasets has yielded universal feature extractors with profound structural awareness.
+
+To leverage these frozen parameters for downstream tasks, prompt learning and visual conditioning paradigms have emerged as a methodology for parameter-efficient adaptation.
+
+However, contemporary approaches relying on deterministic point or box embeddings often prove mathematically rigid. Current literature indicates that state-of-the-art conditioning mechanisms continue to face difficulties with fine-grained intra-object reasoning and reliable distractor suppression, underscoring the need to explore novel alignment frameworks.
+
+\section{Research Objectives}
+
+This doctoral research aims to contribute to the theoretical foundations of visual adaptation through four primary objectives:
+
+\begin{enumerate}[label=\arabic*., noitemsep, topsep=0pt]
+    \item Formulate a unified methodological taxonomy for conditioning generic foundation models to specific semantic priors.
+
+    \item Investigate parameter-efficient visual prompting architectures to improve semantic-geometric alignment while minimizing the risk of catastrophic forgetting.
+
+    \item Explore relational reasoning mechanisms to better handle visual distractors in complex spatial contexts.
+
+    \item Develop and evaluate structure-preserving feature aggregation strategies to improve performance and stability in multi-shot scenarios.
+\end{enumerate}
+
+\section{Proposed Methodology}
+
+The research will be executed via the following systematic phases:
+
+\begin{enumerate}[label=\arabic*., noitemsep, topsep=0pt]
+    \item \textbf{Empirical Baselines:} Establish rigorous evaluation protocols across standard (e.g., PASCAL-$5^i$, COCO-$20^i$) and large-vocabulary (e.g., FSS-1000, LVIS-$92^i$) datasets to benchmark baseline conditioning modules.
+
+    \item \textbf{Parameter-Efficient Optimization:} Implement and test low-rank adaptation and lightweight prompt-generation architectures, striving to preserve the integrity of frozen vision backbones.
+
+    \item \textbf{Semantic Alignment:} Investigate cross-attention matrices, topological graph reasoning, and prototype-to-prototype matching protocols to encourage semantic consistency between reference intent and output generation.
+
+    \item \textbf{Rigorous Evaluation:} Quantify model efficacy via mean Intersection over Union and computational complexity metrics, evaluating explicitly against high-clutter and multi-shot variables.
+\end{enumerate}
+
+\section{Expected Contributions}
+
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item The establishment of a formalized methodological taxonomy for few-shot visual adaptation.
+
+    \item Proposed algorithmic frameworks for controllable, reference-guided semantic alignment designed to reduce distractor interference.
+
+    \item Mathematical approaches intended to enhance multi-shot feature aggregation, contributing to improved scalability.
+
+    \item Crucially, the theoretical and practical contributions of this research will extend significantly beyond the isolated algorithmic improvements proposed in the foundational reference papers, aiming to develop more generalized frameworks for few-shot adaptation across diverse architectural backbones.
+\end{itemize}
+
+\section{Impact and Significance}
+
+This research aims to support the transition from rigid, closed-set perception networks to more flexible, open-world vision systems. By attempting to bridge the semantic-geometric gap with mathematical rigor, the resulting models aspire to facilitate more reliable deployment in dynamic real-world domains such as adaptive medical imaging and autonomous navigation where exhaustive manual annotation is practically infeasible.
+The proposed work fits well within Alexandria University’s expertise in
+AI and machine learning, and will contribute to both academic research and real-world applications.
+\section{References}
+
+\begin{itemize}[noitemsep, topsep=0pt]
+    \item Kirillov, A., Mintun, E., Ravi, N., Mao, H., Rolland, C., Gustafson, L., ... \& Girshick, R. (2023). Segment anything. \textit{Proceedings of the IEEE/CVF International Conference on Computer Vision} (pp. 4015--4026).
+
+    \item Sun, Y., Chen, J., Zhang, S., Zhang, X., Chen, Q., Zhang, G., \& Li, Z. (2024). VRP-SAM: SAM with visual reference prompt. \textit{Proceedings of the IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)} (pp. 23565--23574).
+
+    \item Wang, X., Sebastian, C., He, W., \& Ren, L. (2025). ProSAM: Enhancing the robustness of SAM-based visual reference segmentation with probabilistic prompts. \textit{Proceedings of the IEEE/CVF International Conference on Computer Vision (ICCV)} (pp. 20487--20496).
+
+    \item Liu, Y., Zhu, M., Li, H., Chen, H., Wang, X., \& Shen, C. (2023). Matcher: Segment anything with one shot using all-purpose feature matching. \textit{arXiv preprint arXiv:2305.13310}.
+
+    \item Qi, M., Zhu, P., Li, X., Bi, X., Qi, L., Ma, H., \& Yang, M. H. (2025). DC-SAM: In-context segment anything in images and videos via dual consistency. \textit{IEEE Transactions on Pattern Analysis and Machine Intelligence}.
+
+    \item Zhang, A., Gao, G., Jiao, J., Liu, C., \& Wei, Y. (2024). Bridge the points: Graph-based few-shot segment anything semantically. \textit{Advances in Neural Information Processing Systems (NeurIPS)}, 37, 33232--33261.
+
+    \item Park, S., Lee, S., Seong, H. S., Yoo, J., \& Heo, J. P. (2025). Foreground-covering prototype generation and matching for SAM-aided few-shot segmentation. \textit{Proceedings of the AAAI Conference on Artificial Intelligence}, 39(6), 6425--6433.
+\end{itemize}
+
+\end{document}
