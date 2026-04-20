@@ -555,6 +555,64 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
 \end{frame}
 
 
+% --- PerSAM ---
+% Slide 17
+\begin{frame}{PerSAM: Personalized One-Shot Adaptation \textbf{(ICLR 2024)}}
+\textit{Personalize segment anything model with one shot.}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Motivation \& Concept \cite{zhang2024persam}}
+                Standard SAM fails to segment specific user-designated instances. PerSAM establishes a target-guided attention mechanism via feature similarity and utilizes Parameter-Efficient Fine-Tuning (PEFT) to optimize only 2 scale-aware parameters.
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.48\textwidth}
+            \begin{exampleblock}{Strengths}
+                \begin{itemize}
+                    \item[\textcolor{green!70!black}{\ding{51}}] Extremely lightweight adaptation (fine-tunes in $<$10 seconds).
+                    \item[\textcolor{green!70!black}{\ding{51}}] High fidelity for specific instance tracking in videos.
+                \end{itemize}
+            \end{exampleblock}
+            \begin{alertblock}{Limitations}
+                \begin{itemize}
+                    \item[\textcolor{red}{\ding{55}}] Performance drops under severe pose or lighting variations.
+                    \item[\textcolor{red}{\ding{55}}] Reliant on high-quality initial feature matching.
+                \end{itemize}
+            \end{alertblock}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+% --- DAPSAM ---
+% Slide 18
+\begin{frame}{DAPSAM: Domain-Adaptive Medical SDG \textbf{(MICCAI 2024)}}
+\textit{Prompting SAM with domain-adaptive prototype for medical image segmentation.}
+    \begin{columns}[T]
+        \begin{column}{0.48\textwidth}
+            \begin{block}{Motivation \& Concept \cite{wei2024prompting}}
+                Bridges the natural-to-clinical domain gap (SDG). It injects domain-specific knowledge into SAM via learnable prototypes that handle low-contrast tissue boundaries and scanner variations in MRI/CT data.
+            \end{block}
+        \end{column}
+        
+        \begin{column}{0.48\textwidth}
+            \begin{exampleblock}{Strengths}
+                \begin{itemize}
+                    \item[\textcolor{green!70!black}{\ding{51}}] Strong Single-Source Domain Generalization (SDG).
+                    \item[\textcolor{green!70!black}{\ding{51}}] Effectively manages fuzzy anatomical boundaries.
+                \end{itemize}
+            \end{exampleblock}
+            \begin{alertblock}{Limitations}
+                \begin{itemize}
+                    \item[\textcolor{red}{\ding{55}}] Requires representative clinical data for meta-training.
+                    \item[\textcolor{red}{\ding{55}}] Added computational latency from domain-alignment modules.
+                \end{itemize}
+            \end{alertblock}
+        \end{column}
+    \end{columns}
+\end{frame}
+
+
+
 
 
 % ==========================================
