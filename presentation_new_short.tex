@@ -304,7 +304,7 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
     Bridge the Points (NeurIPS 2024) \cite{zhang2024bridge} & Graph-based reasoning (Relational) \\
     FCP-SAM (AAAI 2025) \cite{park2025fcpsam} & Prototype-based modeling (Averaging) \\
     PerSAM (ICLR 2024) \cite{zhang2024persam} & Personalized adaptation (One-shot PEFT) \\
-    DAPSAM (MICCAI 2024)\footnote{\tiny DAPSAM focuses on single-source domain generalization (SSDG) rather than typical FSS; it is included here as it generates task-specific prompts and adapts the SAM foundation model to the medical domain.} \cite{wei2024prompting} & Domain-adaptive prompting (Medical SSDG) \\
+    DAPSAM (MICCAI 2024) \cite{wei2024prompting} \footnote{\tiny DAPSAM focuses on single-source domain generalization (SSDG) rather than typical FSS; it is included here as it generates task-specific prompts and adapts the SAM foundation model to the medical domain.} & Domain-adaptive prompting (Medical SSDG) \\
     \bottomrule
     \end{tabular}
     \end{table}
@@ -407,7 +407,7 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
     Matcher \cite{liu2023matcher} & DINOv2 & -- & -- & 52.7 & 60.7 & 87.0 & \textbf{89.6} & 33.0 & 40.0 \\
     DC-SAM \cite{qi2025dcsam} & ResNet-50 & 73.0 & -- & 55.5 & -- & -- & -- & -- & -- \\
     DC-SAM \cite{qi2025dcsam} & DINOv2 & -- & -- & \textbf{62.0} & -- & -- & -- & -- & -- \\
-    DC-SAM (SAM2) \cite{qi2025dcsam} & ResNet-50 & \textbf{74.0} & -- & 56.4 & -- & -- & -- & -- & -- \\
+    DC-SAM (SAM2) \cite{qi2025dcsam},\cite{ravi2024sam2} & ResNet-50 & \textbf{74.0} & -- & 56.4 & -- & -- & -- & -- & -- \\
     Bridge-the-Points \cite{zhang2024bridge} & DINOv2 & 72.1 & \textbf{82.6} & 58.7 & \textbf{66.8} & \textbf{88.0} & 88.9 & \textbf{35.2} & \textbf{44.2} \\
     FCP-SAM \cite{park2025fcpsam} & ResNet-50 & 73.2 & 74.0 & 52.5 & 58.0 & -- & -- & -- & -- \\
     \bottomrule
@@ -563,7 +563,7 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
 \end{frame}
 
 
-\begin{frame}{1. VRP-SAM: Model Soup Architecture (Enhancement) }
+\begin{frame}{1. VRP-SAM: Model Soup Architecture (Enhancement) \cite{wasfy2023enhancing} }
     \begin{figure}[h]
         \centering
         \IfFileExists{model_soup.png}{
@@ -580,7 +580,7 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
 
 \begin{frame}{1. VRP-SAM: Iterative Model Soup Enhancements}
     \begin{block}{Methodology}
-        We applied an \textbf{Iterative Uniform Greedy Soup} to dynamically average weights across fine-tuning checkpoints, seeking to smooth the loss landscape without adding inference latency.
+        We applied an \textbf{Iterative Uniform Greedy Soup and Standard Greedy Soup} \cite{wasfy2023enhancing},\cite{wortsman2022modelsoups} to dynamically average weights across fine-tuning checkpoints, seeking to smooth the loss landscape without adding inference latency.
     \end{block}
 
     \vspace{-0.2cm}
@@ -780,7 +780,7 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
 % Slide 24
 \begin{frame}{3. PerSAM: SAM3 Text-Prompted Pipeline Evaluation}
     \begin{block}{Experimental Setup}
-        To assess if PerSeg objects genuinely demand visual personalization, a novel SAM3 pipeline was tested using \textbf{only manual text descriptions} (e.g., \textit{"silver beverage can"}).
+        To assess if PerSeg objects genuinely demand visual personalization, a novel SAM3\cite{carion2025sam3} pipeline was tested using \textbf{only manual text descriptions} (e.g., \textit{"silver beverage can"}).
     \end{block}
 
     \begin{table}[htbp]
@@ -1177,6 +1177,9 @@ Ramanathan, V., Kalia, A., Petrovic, V., Wen, Y., Zheng, B., Guo, B., ... \& Mar
 \bibitem{wang2019panet}
 Wang, K., Liew, J. H., Zou, Y., Zhou, D., \& Feng, J. (2019). PANet: Few-shot image semantic segmentation with prototype alignment. In \textit{Proceedings of the IEEE/CVF International Conference on Computer Vision} (pp. 9197-9206).
 
+\bibitem{tian2020pfenet}
+Tian, Z., Zhao, H., Shu, M., Yang, Z., Li, R., \& Jia, J. (2020). Prior guided feature enrichment network for few-shot segmentation. \textit{IEEE Transactions on Pattern Analysis and Machine Intelligence}, 44(2), 1050-1065.
+
 \bibitem{sun2024vrp}
 Sun, Y., Chen, J., Zhang, S., Zhang, X., Chen, Q., Zhang, G., \& Li, Z. (2024).
 VRP-SAM: SAM with visual reference prompt.
@@ -1222,10 +1225,26 @@ Pont-Tuset, J., Perazzi, F., Marques, S., Garcia, J., \& Van Gool, L. (2017).
 The 2017 davis challenge on video object segmentation. 
 \textit{arXiv preprint arXiv:1704.00675}.
 
+\bibitem{ravi2024sam2}
+Ravi, N., Gabeur, V., Hu, Y. T., Hu, R., Ryali, C., Ma, T., \& Feichtenhofer, C. (2024).
+SAM 2: Segment anything in images and videos.
+\textit{arXiv preprint arXiv:2408.00714}.
+
+\bibitem{carion2025sam3}
+Carion, N., Gustafson, L., Hu, Y. T., Debnath, S., Hu, R., Suris, D., \& Feichtenhofer, C. (2025).
+SAM 3: Segment anything with concepts.
+\textit{arXiv preprint arXiv:2511.16719}.
+
+\bibitem{wortsman2022modelsoups}
+Wortsman, M., Ilharco, G., Gadre, S. Y., Roelofs, R., Gontijo-Lopes, R., Morcos, A. S., \& Schmidt, L. (2022).
+Model soups: Averaging weights of multiple fine-tuned models improves accuracy without increasing inference time.
+In \textit{Proceedings of the 39th International Conference on Machine Learning (ICML)} (pp. 23965--23998). PMLR.
+
 \bibitem{wasfy2023enhancing}
 Wasfy, O., Basiony, S., \& Torki, M. (2023).
 Enhancing LiDAR Semantic Segmentation Using Model Soups.
 In \textit{2023 20th ACS/IEEE International Conference on Computer Systems and Applications (AICCSA)} (pp. 1--7). IEEE.
+
 
  \end{thebibliography}
 \end{frame}
