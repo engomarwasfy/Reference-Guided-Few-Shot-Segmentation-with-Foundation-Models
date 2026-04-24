@@ -310,52 +310,29 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
     \end{table}
 \end{frame}
 
-% Slide 11
-\begin{frame}{Architectural Overviews (1/2)}
+% Slide 11: Architectural Overviews
+\begin{frame}{Architectural Overviews: Key SAM Adaptations}
+    \footnotesize
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
-            \begin{block}{VRP-SAM \textbf{(CVPR 2024)}}
-                Automates prompt generation via an auxiliary semantic encoder (ResNet) and multi-head cross-attention. Highly efficient, but susceptible to prompt sensitivity during severe target deformation.
-            \end{block}
-            \begin{block}{ProSAM \textbf{(ICCV 2025)}}
-                Models the prompt space as a continuous multivariate distribution to marginalize uncertainty. Exceptionally robust to boundaries, but processing multiple prompts massively increases latency.
-            \end{block}
+            \begin{itemize}
+                \item \textbf{VRP-SAM:} Aux-encoder prompt automation. Efficient; sensitive to deformation.
+                \item \textbf{ProSAM:} Multivariate prompt modeling. Boundary-robust; high latency.
+                \item \textbf{Matcher:} Zero-shot DINOv2 cycle-consistency. Strong instance-level matching; susceptible to distractors.
+                \item \textbf{DC-SAM:} Cyclic deviation checks. Mitigates semantic drift; high memory footprint.
+            \end{itemize}
         \end{column}
         
         \begin{column}{0.48\textwidth}
-            \begin{block}{Matcher \textbf{(IJCV 2025)}}
-                Bypasses prompt training. Constructs dense correlation volumes using DINOv2 features and enforces cycle-consistency. Zero-shot operation, but prone to false-positive matches on distractors.
-            \end{block}
-            \begin{block}{DC-SAM \textbf{(TPAMI 2025)}}
-                Maps initial predictions back to prompt space to calculate deviation, acting as a cyclic check. Uses explicit negative targets. Resolves semantic drift but inflates memory footprint.
-            \end{block}
+            \begin{itemize}
+                \item \textbf{Bridge-the-Points:} Directed graph clustering. Solves occlusion; $\mathcal{O}(|\mathcal{V}|^2)$ complexity in worst case.
+                \item \textbf{FCP-SAM:} Dense prototype vectors. Strong multi-shot scaling; relies on aux-backbones.
+                \item \textbf{PerSAM:} Target attention \& PEFT. Extremely lightweight; vulnerable to pose/lighting shifts.
+                \item \textbf{DAPSAM:} Clinical domain prototypes. Handles fuzzy boundaries; increased latency.
+            \end{itemize}
         \end{column}
     \end{columns}
 \end{frame}
-
-% Slide 12
-\begin{frame}{Architectural Overviews (2/2)}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Bridge-the-Points \textbf{(NeurIPS 2024)}}
-                Maps spatial relationships as a directed graph. Clusters vertices by finding strongly connected components. Solves multi-instance occlusion but suffers from $\mathcal{O}(|\mathcal{V}|^2)$ complexity in worst case.
-            \end{block}
-            \begin{block}{FCP-SAM \textbf{(AAAI 2025)}}
-                Abandons points for a unified, dense prototype vector. Exceptional global context modeling for multi-shot scaling, but heavily relies on auxiliary backbones (ResNet).
-            \end{block}
-        \end{column}
-        
-        \begin{column}{0.48\textwidth}
-            \begin{block}{PerSAM \textbf{(ICLR 2024)}}
-                Establishes target-guided attention via feature similarity and utilizes Parameter-Efficient Fine-Tuning (PEFT) for personalization. Extremely lightweight but vulnerable to severe lighting/pose shifts.
-            \end{block}
-            \begin{block}{DAPSAM \textbf{(MICCAI 2024)}}
-                Bridges the natural-to-clinical domain gap by injecting domain-specific knowledge via learnable prototypes. Effectively manages fuzzy medical boundaries but adds computational latency.
-            \end{block}
-        \end{column}
-    \end{columns}
-\end{frame}
-
 % ==========================================
 % SECTION 5: DATASETS & EVALUATION METRICS
 % ==========================================
@@ -387,7 +364,7 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
 
 % Slide 14
 % Slide 25
-\begin{frame}{Overall Results: Standard \& Large-Vocabulary Datasets}
+\begin{frame}{Literature Results: Standard \& Large-Vocabulary Datasets}
     \vspace{-0.1cm}
     \begin{table}[htbp]
     \centering
@@ -511,6 +488,56 @@ Computer and Systems Engineering Department, Faculty of Engineering\\
         \item \textbf{Domain Adaptation Overhead:} DAPSAM introduces additional modules to bridge distribution gaps, improving medical robustness but increasing computational cost compared to standard pipelines.
     \end{itemize}
 \end{frame}
+
+
+% ==========================================
+% SECTION 8: DISCUSSION
+% ==========================================
+\section{Discussion and Research Gaps}
+
+% Slide 1: Consolidated Discussion
+\begin{frame}{Discussion and Key Insights}
+    \begin{block}{Semantic Alignment \& Prompting}
+        \footnotesize
+        \begin{itemize}
+            \item SAM's geometric prompts require explicit semantic correspondence to manage dense distractors (COCO, LVIS) and fine boundaries.
+            \item Incorporating negative references resolves target-distractor ambiguities and mitigates overfitting to dominant multi-shot patterns.
+        \end{itemize}
+    \end{block}
+
+    \begin{block}{Representations \& Computational Trade-Offs}
+        \footnotesize
+        \begin{itemize}
+            \item Self-supervised transformers (e.g., DINOv2) establish a strictly higher performance ceiling compared to convolutional baselines.
+            \item Multi-stage reasoning boosts accuracy in cluttered scenes but degrades latency and memory, necessitating dynamic, adaptive frameworks.
+        \end{itemize}
+    \end{block}
+\end{frame}
+
+% Slide 2: Consolidated Research Gaps
+\begin{frame}{Research Gaps}
+    \begin{alertblock}{Scalability \& Intrinsic Alignment Limitations}
+        \footnotesize
+        \begin{itemize}
+            \item Iterative refinement and multi-stage graph constructions increase inference overhead, hindering deployment in resource-constrained settings.
+            \item Current architectures heavily depend on complex auxiliary alignment modules; establishing intrinsic semantic correspondence directly within foundation encoders remains an open challenge.
+        \end{itemize}
+    \end{alertblock}
+    
+      \begin{alertblock}{The Multi-Shot Degradation Problem}
+        \footnotesize
+        \begin{itemize}
+            \item Increasing support examples ($K>1$) sometimes underperforms one-shot baselines, as naive feature aggregation dilutes discriminative cues across pose or scale variations.
+            \item Frameworks lack principled weighting mechanisms for contradictory support evidence, introducing severe processing bottlenecks.
+        \end{itemize}
+    \end{alertblock}
+\end{frame}
+
+
+
+
+
+
 
 % ==========================================
 % SECTION 7: COMPLETED WORK IN PHD
@@ -870,197 +897,44 @@ The Optic Cup (DOC) has weaker boundaries than the Optic Disc (DOD), increasing 
     
 \end{frame}
 
-% ==========================================
-% SECTION 8: DISCUSSION
-% ==========================================
-\section{Discussion and Research Gaps}
 
-% Slide 27
-\begin{frame}{Discussion I}
-    \begin{block}{The Necessity of Explicit Semantic Alignment}
-        \footnotesize
-        \begin{itemize}
-            \item SAM’s native geometric prompts are insufficient for reliable reference-guided segmentation without additional semantic alignment.
-            \item Crucial on datasets like COCO-$20^i$ and LVIS-$92^i$, where dense distractors require precise semantic correspondence.
-            \item Essential for fine-grained intra-object boundaries (PASCAL-Part) where geometric cues fail.
-        \end{itemize}
-    \end{block}
-
-    \begin{block}{Insights on Negative Prompting}
-        \footnotesize
-        \begin{itemize}
-            \item Treating non-target regions as negative references helps resolve ambiguities between the target object and visually similar distractors.
-            \item Prevents overfitting to dominant foreground patterns in multi-shot scenarios.
-        \end{itemize}
-    \end{block}
-\end{frame}
-
-% Slide 28
-\begin{frame}{Discussion II}
-    \begin{block}{Impact of Representation Quality}
-        \footnotesize
-        \begin{itemize}
-            \item Replacing convolutional backbones (ResNet-50) with self-supervised transformers (DINOv2) consistently yields substantial performance gains.
-            \item The performance ceiling of reference-guided segmentation is strongly influenced by the underlying visual representation.
-        \end{itemize}
-    \end{block}
-
-    \begin{block}{Dataset-Dependent Performance Behavior}
-        \footnotesize
-        \begin{itemize}
-            \item \textbf{PASCAL-$5^i$:} Lightweight prompt-based approaches remain competitive.
-            \item \textbf{COCO-$20^i$ / LVIS-$92^i$:} Methods incorporating relational reasoning or consistency enforcement demonstrate clear advantages in cluttered environments.
-        \end{itemize}
-    \end{block}
-\end{frame}
-
-% Slide 29
-\begin{frame}{Discussion III}
-    \begin{block}{Trade-Offs: Robustness vs. Computational Efficiency}
-        \footnotesize
-        \begin{itemize}
-            \item Methods achieving strong performance on challenging datasets often employ multi-stage reasoning or graph construction, increasing latency and memory consumption.
-            \item Highlights the need for adaptive frameworks that dynamically adjust computational effort according to scene complexity.
-        \end{itemize}
-    \end{block}
-
-    \begin{block}{Limitations and Future Implications}
-        \footnotesize
-        \begin{itemize}
-            \item Existing approaches rely heavily on auxiliary mechanisms, increasing architectural complexity.
-            \item Future frameworks should integrate semantically aligned representations directly from foundation-model encoders with efficient inference strategies.
-        \end{itemize}
-    \end{block}
-\end{frame}
-
-
-
-
-% Slide 31
-\begin{frame}{Research Gaps I}
-    \begin{alertblock}{The Multi-Shot Degradation Problem}
-        \footnotesize
-        \begin{itemize}
-            \item Despite intuitive expectations, increasing support examples (e.g., $K=5$) does not consistently outperform one-shot configurations.
-            \item Naive aggregation strategies (like feature averaging) dilute discriminative semantic cues when the target exhibits severe pose, scale, or articulation changes.
-            \item Existing approaches lack principled mechanisms for weighting contradictory support evidence.
-            \item Introduces significant processing bottlenecks (e.g., in probabilistic sampling or graph clustering), limiting real-time applicability.
-        \end{itemize}
-    \end{alertblock}
-\end{frame}
-
-% Slide 32
-\begin{frame}{Research Gaps II}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \begin{alertblock}{Scalability \& Efficiency Constraints}
-                \footnotesize
-                \begin{itemize}
-                    \item Many high-performing approaches rely on multi-stage reasoning or iterative refinement.
-                    \item This significantly increases memory consumption and inference latency.
-                    \item Hinders deployment in resource-constrained settings; balancing accuracy and efficiency remains an open challenge.
-                \end{itemize}
-            \end{alertblock}
-        \end{column}
-        
-        \begin{column}{0.48\textwidth}
-            \begin{alertblock}{Representation \& Alignment Limitations}
-                \footnotesize
-                \begin{itemize}
-                    \item Current frameworks rely heavily on external alignment mechanisms to compensate for the lack of inherent semantic correspondence.
-                    \item Developing models capable of \textbf{intrinsic semantic alignment} without complex auxiliary modules is a critical direction.
-                \end{itemize}
-            \end{alertblock}
-        \end{column}
-    \end{columns}
-\end{frame}
 
 % ==========================================
 % SECTION 10: PROPOSED DIRECTIONS
 % ==========================================
 \section{Proposed PhD Research Directions}
 
-% Slide 33
-\begin{frame}{Proposed PhD Research Directions I}
+% Slide 1: Consolidated Proposed Directions
+\begin{frame}{Proposed Research Directions \& Contributions}
     \begin{columns}[T]
         \begin{column}{0.48\textwidth}
-            \begin{block}{Prompt Robustness \& Stability}
+            \begin{block}{Methodology \& Adaptation}
                 \footnotesize
                 \begin{itemize}
-                    \item Develop simple uncertainty-aware strategies (prompt averaging, confidence-based weighting).
-                    \item Design robust prompt selection mechanisms to reduce sensitivity to noisy or imperfect masks.
-                    \item Systematically evaluate prompt variability impact across datasets and shot settings.
+                    \item \textbf{Robust Alignment:} Integrate uncertainty-aware prompt weighting and lightweight cross-image feature matching.
+                    \item \textbf{Efficient Modules:} Design parameter-efficient adapters for a frozen SAM backbone to minimize overhead.
+                    \item \textbf{Complexity Handling:} Enforce spatial consistency to suppress distractors in cluttered datasets (e.g., COCO-$20^i$).
                 \end{itemize}
             \end{block}
         \end{column}
+        
         \begin{column}{0.48\textwidth}
-            \begin{block}{Cross-Image Feature Alignment}
+            \begin{block}{Deployment \& Key Contributions}
                 \footnotesize
                 \begin{itemize}
-                    \item Investigate lightweight alignment mechanisms without excessive cost.
-                    \item Combine prompt-based conditioning with selective feature matching.
-                    \item Introduce filtering or attention strategies to suppress distractors in cluttered scenes.
+                    \item \textbf{Resource Optimization:} Minimize inference latency and memory footprint to ensure feasibility on constrained hardware.
+                    \item \textbf{Expected Outcomes:}
+                    \begin{itemize}
+                        \footnotesize
+                        \item A novel, lightweight conditioning framework for SAM-based FSS.
+                        \item Systematic failure mode analysis in complex visual environments.
+                        \item Reproducible benchmarks under standardized evaluation protocols.
+                    \end{itemize}
                 \end{itemize}
             \end{block}
         \end{column}
     \end{columns}
 \end{frame}
-
-% Slide 34
-\begin{frame}{Proposed PhD Research Directions II}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Robustness to Scene Complexity}
-                \footnotesize
-                \begin{itemize}
-                    \item Conduct systematic failure analysis in multi-instance and cluttered environments.
-                    \item Introduce simple structural constraints (spatial consistency enforcement or region filtering).
-                    \item Evaluate robustness across increasing complexity (COCO-$20^i$, LVIS).
-                \end{itemize}
-            \end{block}
-        \end{column}
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Lightweight Adaptation}
-                \footnotesize
-                \begin{itemize}
-                    \item Explore parameter-efficient modules (lightweight adapters or refinement layers).
-                    \item Preserve the frozen SAM backbone to maintain computational efficiency.
-                    \item Study the trade-off between performance improvement and computational cost.
-                \end{itemize}
-            \end{block}
-        \end{column}
-    \end{columns}
-\end{frame}
-
-
-
-% Slide 35
-\begin{frame}{Proposed Directions \& Contributions}
-    \begin{columns}[T]
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Practical Deployment}
-                \footnotesize
-                \begin{itemize}
-                    \item Analyze inference latency and memory usage across methods.
-                    \item Optimize selected approaches for reduced computational overhead.
-                    \item Evaluate feasibility for constrained hardware.
-                \end{itemize}
-            \end{block}
-        \end{column}
-        \begin{column}{0.48\textwidth}
-            \begin{block}{Expected Contributions}
-                \footnotesize
-                \begin{itemize}
-                    \item Reproducible evaluation of SAM-based FSS under unified settings.
-                    \item Systematic analysis of key failure modes.
-                    \item A lightweight, robust, and computationally efficient conditioning framework.
-                    \item Standardized evaluation protocols.
-                \end{itemize}
-            \end{block}
-        \end{column}
-    \end{columns}
-\end{frame}
-
 % Slide 36
 \begin{frame}{Research Plan and Phases}
     \begin{columns}[T]

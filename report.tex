@@ -213,7 +213,11 @@ Faculty of Engineering\\
 
 \newpage
 
-\begin{abstract}
+
+
+\chapter*{Abstract}
+\normalsize
+
 Reference-guided few-shot segmentation with foundation models addresses open-set, class-agnostic dense prediction by leveraging a limited set of annotated support examples to segment unseen objects in query images. While vision foundation models such as the Segment Anything Model (SAM) provide strong geometric priors, they lack intrinsic mechanisms for semantic alignment across images, resulting in a semantic--geometric gap that limits their direct applicability to few-shot scenarios.  
 
 This report presents a structured review of recent approaches that attempt to bridge this gap. A taxonomy is introduced to organize existing methods into prompt-based adaptation, probabilistic prompting, feature matching, consistency-based learning, graph-based reasoning, prototype-based modeling, personalized adaptation, and domain-specific adaptation. The report summarizes their core ideas, architectural components, and trade-offs, and discusses their behavior across commonly used benchmarks, including PASCAL-5i, COCO-20i, LVIS, and part-level datasets.  
@@ -221,7 +225,6 @@ This report presents a structured review of recent approaches that attempt to br
 In addition, the report documents the work completed so far during the PhD, including reproduction of selected methods and experimental results obtained from these implementations. These experiments provide practical insights into the behavior of different approaches, particularly with respect to prompt sensitivity, robustness in complex scenes, and handling of structural variations.  
 
 Based on this analysis, the report identifies a set of research directions to be explored in the next phases of the PhD, focusing on improving robustness and generalization through more effective conditioning mechanisms and better handling of domain variability. The report therefore serves as both a consolidation of existing work and a foundation for the planned research.
-\end{abstract}
 
 \newpage
 \tableofcontents
@@ -448,7 +451,7 @@ The Segment Anything Model (SAM) is arguably the most prominent vision foundatio
 }{%
     \framebox[\linewidth]{\rule{0pt}{200pt}\textbf{Missing Image: SAM.png}}%
 }
-\caption{Detailed architecture of the Segment Anything Model (SAM) highlighting the heavy Image Encoder, the flexible Prompt Encoder, and the lightweight, real-time Mask Decoder.}
+\caption{Detailed architecture of the Segment Anything Model (SAM) highlighting the heavy Image Encoder, the flexible Prompt Encoder, and the lightweight, real-time Mask Decoder. \cite{kirillov2023segment}}
 \label{fig:SAM}
 \end{figure}
 
@@ -489,7 +492,7 @@ Directly applying SAM to few-shot semantic segmentation tasks is hindered by its
     \centering
     \IfFileExists{VRP-SAM-1.png}{%
         \includegraphics[width=1\linewidth]{VRP-SAM-1.png}%
-    \caption{Comparison of SAM’s built-in Point and Box prompt modes with Visual Reference Prompt when handling numerous images. The prompts are all provided by users.}
+    \caption{Comparison of SAM’s built-in Point and Box prompt modes with Visual Reference Prompt when handling numerous images. The prompts are all provided by users. \cite{sun2024vrp}}
     }
    
     \label{fig:VRP-SAM-1}
@@ -505,7 +508,7 @@ However, relying solely on SAM's ViT encoder to extract features from the suppor
     \centering
     \IfFileExists{VRP-SAM-2.png}{%
         \includegraphics[width=1\linewidth]{VRP-SAM-2.png}%
-        \caption{A Comparison between SAM and VRP-SAM. VRP-SAM introduces a visual reference prompt encoder, accepting annotated reference images with point, scribble, box, and mask formats, offering a distinct enhancement over SAM.}
+        \caption{A Comparison between SAM and VRP-SAM. VRP-SAM introduces a visual reference prompt encoder, accepting annotated reference images with point, scribble, box, and mask formats, offering a distinct enhancement over SAM. \cite{sun2024vrp}}
     }
    
     \label{fig:VRP-SAM-2}
@@ -524,7 +527,7 @@ where $K_s$ and $V_s$ are the key and value projections generated from the foreg
     \centering
     \IfFileExists{VRP-SAM-3.png}{%
         \includegraphics[width=1\linewidth]{VRP-SAM-3.png}%
-        \caption{VRP-SAM framework. The approach enables SAM to perform visual reference segmentation by extends a VRP encoder. It takes various granularities of visual references as inputs and encodes these visual references into prompt embeddings. The VRP encoder consists of a feature augmenter and a prompt generator.}
+        \caption{VRP-SAM framework. The approach enables SAM to perform visual reference segmentation by extends a VRP encoder. It takes various granularities of visual references as inputs and encodes these visual references into prompt embeddings. The VRP encoder consists of a feature augmenter and a prompt generator. \cite{sun2024vrp}}
     }
     
     \label{fig:VRP-SAM-3}
@@ -560,7 +563,7 @@ Deterministic prompt generation, as utilized in VRP-SAM, is inherently brittle. 
     \centering
     \IfFileExists{PRO-SAM-1.png}{%
         \includegraphics[width=1\linewidth]{PRO-SAM-1.png}%
-        \caption{The same mask can be generated by SAM using various prompts in a region.}
+        \caption{The same mask can be generated by SAM using various prompts in a region. \cite{wang2025prosam}}
     }
     
     \label{fig:PRO-SAM-1}
@@ -578,7 +581,7 @@ Instead of a single discrete vector, the encoder predicts the mean vector $\mu$ 
     \centering
     \IfFileExists{PRO-SAM-2.png}{%
         \includegraphics[width=0.75\linewidth]{PRO-SAM-2.png}%
-         \caption{Intuitive illustration of the high-level idea behind the proposed variational prompt encoder. The dashed arrow shows the sampling and prompting procedure during training, while the solid arrow shows the prompting strategy during inference. Note that our generated prompts can be any type of prompt, while this illustration shows a positive point prompt as an example.}
+         \caption{Intuitive illustration of the high-level idea behind the proposed variational prompt encoder. The dashed arrow shows the sampling and prompting procedure during training, while the solid arrow shows the prompting strategy during inference. Note that our generated prompts can be any type of prompt, while this illustration shows a positive point prompt as an example. \cite{wang2025prosam}}
     }
    
     \label{fig:PRO-SAM-2}
@@ -595,7 +598,7 @@ By strictly penalizing high-curvature regions, ProSAM structurally pushes the me
     \centering
     \IfFileExists{PRO-SAM-3.png}{%
         \includegraphics[width=1\linewidth]{PRO-SAM-3.png}%
-         \caption{The overview of ProSAM, which segments the target images based on the visual references. Given a pre-trained SAM, a variational prompt encoder is trained to predict a multivariate prompt distribution with reparameterization trick. During the inference, the predicted mean prompt is employed to guide SAM in producing robust mask prediction for the target image.}
+         \caption{The overview of ProSAM, which segments the target images based on the visual references. Given a pre-trained SAM, a variational prompt encoder is trained to predict a multivariate prompt distribution with reparameterization trick. During the inference, the predicted mean prompt is employed to guide SAM in producing robust mask prediction for the target image. \cite{wang2025prosam}}
     }
   
     \label{fig:PRO-SAM-3}
@@ -632,7 +635,7 @@ Rather than compressing rich semantic information into SAM's extremely limited p
     \centering
     \IfFileExists{MATCHER-1.png}{%
         \includegraphics[width=1\linewidth]{MATCHER-1.png}%
-        \caption{Illustration of the proposed bidirectional matching. Bidirectional matching consists of three steps: forward matching, reverse matching, and mask filtering. Purple points denote the matched points. Red points denote the outliers.}
+        \caption{Illustration of the proposed bidirectional matching. Bidirectional matching consists of three steps: forward matching, reverse matching, and mask filtering. Purple points denote the matched points. Red points denote the outliers. \cite{liu2023matcher}}
     }
    
     \label{fig:MATCHER-1}
@@ -663,7 +666,7 @@ By calculating the minimum cost to transform the query mask distribution into th
     \centering
     \IfFileExists{MATCHER-2.png}{%
         \includegraphics[width=1\linewidth]{MATCHER-2.png}%
-        \caption{An overview of Matcher. The training-free framework addresses various segmentation tasks through three operations: Correspondence Matrix Extraction, Prompts Generation, and Controllable Masks Generation.}
+        \caption{An overview of Matcher. The training-free framework addresses various segmentation tasks through three operations: Correspondence Matrix Extraction, Prompts Generation, and Controllable Masks Generation. \cite{liu2023matcher}}
     }
    
     \label{fig:MATCHER-2}
@@ -711,7 +714,7 @@ DC-SAM fundamentally improves robustness by employing a dual-branch strategy. Wh
     \centering
     \IfFileExists{DC-SAM-1.png}{%
         \includegraphics[width=1\linewidth]{DC-SAM-1.png}%
-        \caption{Illustration of The proposed cyclic consistent cross-attention mechanism. This figure shows the version applied to query features with one head. The “Cyc” operation ultimately generates a bias to filter out features that are not cycle-consistent.}
+        \caption{Illustration of The proposed cyclic consistent cross-attention mechanism. This figure shows the version applied to query features with one head. The “Cyc” operation ultimately generates a bias to filter out features that are not cycle-consistent. \cite{qi2025dcsam}}
     }
    
     \label{fig:DC-SAM-1}
@@ -721,7 +724,7 @@ DC-SAM fundamentally improves robustness by employing a dual-branch strategy. Wh
     \centering
     \IfFileExists{DC-SAM-2.png}{%
         \includegraphics[width=1\linewidth]{DC-SAM-2.png}%
-        \caption{Overview of the proposed DC-SAM framework. We use positive and negative branches to generate respective prompts, thereby refining the scope of the final generated mask. Additionally, we incorporate SAM features during the prompt generation process to better capture the characteristics of SAM, resulting in more accurate prompt boundaries. During the prompt generation process, we introduce cyclic consistent cross-attention to filter out non-cycle-consistent feature points, enhancing the precision of the prompts.}
+        \caption{Overview of the proposed DC-SAM framework. We use positive and negative branches to generate respective prompts, thereby refining the scope of the final generated mask. Additionally, we incorporate SAM features during the prompt generation process to better capture the characteristics of SAM, resulting in more accurate prompt boundaries. During the prompt generation process, we introduce cyclic consistent cross-attention to filter out non-cycle-consistent feature points, enhancing the precision of the prompts. \cite{qi2025dcsam}}
     }
     
     \label{fig:DC-SAM-2}
@@ -731,7 +734,7 @@ DC-SAM fundamentally improves robustness by employing a dual-branch strategy. Wh
     \centering
     \IfFileExists{DC-SAM-3.png}{%
         \includegraphics[width=1\linewidth]{DC-SAM-3.png}%
-        \caption{Illustration of The proposed DC-SAM framework with SAM2 \cite{ravi2024sam2}. Unlike the image-level framework, we train the entire model for the video to acquire the image-to-video prompt ability. They apply different data augmentation techniques to the query image, and the augmented images compose a mask tube for training.}
+        \caption{Illustration of The proposed DC-SAM framework with SAM2 \cite{ravi2024sam2}. Unlike the image-level framework, we train the entire model for the video to acquire the image-to-video prompt ability. They apply different data augmentation techniques to the query image, and the augmented images compose a mask tube for training. \cite{qi2025dcsam}}
     }
     
     \label{fig:DC-SAM-3}
@@ -784,7 +787,7 @@ To mitigate false positives, the method introduces strict post-gating strategies
     \centering
     \IfFileExists{BRIDGE-THE-POINTS-1.png}{%
         \includegraphics[width=1\linewidth]{BRIDGE-THE-POINTS-1.png}%
-        \caption{Overview of The approach, where the Positive-Negative Alignment module recognizes the correlation between target features and reference features for point selection, the Point-Mask Clustering module efficiently clusters the points based on the coverage of corresponding masks, and Post-Gating filters out the false-positive masks for generating final prediction.}
+        \caption{Overview of The approach, where the Positive-Negative Alignment module recognizes the correlation between target features and reference features for point selection, the Point-Mask Clustering module efficiently clusters the points based on the coverage of corresponding masks, and Post-Gating filters out the false-positive masks for generating final prediction. \cite{zhang2024bridge}}
     }
    
     \label{fig:BRIDE-THE-POINTS-1}
@@ -802,7 +805,7 @@ Discrete point and box prompts lack the capacity to convey complex, non-rigid ob
     \centering
     \IfFileExists{FCP-SAM-1.png}{%
         \includegraphics[width=1\linewidth]{FCP-SAM-1.png}%
-        \caption{Comparison between ResNet and SAM Image Encoder features on 1000 PASCAL VOC images in test dataset, demonstrating their complementary strengths. (a) Similarity difference between FG-to-FG and FG-to-BG within the image. The higher similarity difference shown in SAM Image Encoder features reflects its superior pixel-level aggregation for prototype construction. (b) Difference between the FG-toFG similarity from the same class (intra-class) and different classes (inter-class). Compared to SAM features, ResNet features convey better class consistency across different images.}
+        \caption{Comparison between ResNet and SAM Image Encoder features on 1000 PASCAL VOC images in test dataset, demonstrating their complementary strengths. (a) Similarity difference between FG-to-FG and FG-to-BG within the image. The higher similarity difference shown in SAM Image Encoder features reflects its superior pixel-level aggregation for prototype construction. (b) Difference between the FG-toFG similarity from the same class (intra-class) and different classes (inter-class). Compared to SAM features, ResNet features convey better class consistency across different images. \cite{park2025fcpsam}}
     }
    
     \label{fig:FCP-SAM-1}
@@ -842,7 +845,7 @@ Instead of relying on rigid geometric pseudo-masks, FCP-SAM introduces a dynamic
     \centering
     \IfFileExists{FCP-SAM-2.png}{%
         \includegraphics[width=1\linewidth]{FCP-SAM-2.png}%
-        \caption{Overall pipeline of foreground-covering prototype generation and matching. Given SAM image encoder features, foreground regions are first highlighted using the support ground-truth mask and a pseudo mask for the query. The guided features are aggregated into learnable tokens via cross-attention. Since SAM features are not consistent across images, ResNet features are additionally used to provide class-consistent information. These ResNet features are guided by the support mask and an attention-based pseudo mask for the query to enhance foreground representation. The refined information is injected into the tokens to produce support and query prototypes. Finally, the query prototypes are matched with the support prototypes to form visual prompts, which are fed to the SAM decoder to predict the final query segmentation mask.}
+        \caption{Overall pipeline of foreground-covering prototype generation and matching. Given SAM image encoder features, foreground regions are first highlighted using the support ground-truth mask and a pseudo mask for the query. The guided features are aggregated into learnable tokens via cross-attention. Since SAM features are not consistent across images, ResNet features are additionally used to provide class-consistent information. These ResNet features are guided by the support mask and an attention-based pseudo mask for the query to enhance foreground representation. The refined information is injected into the tokens to produce support and query prototypes. Finally, the query prototypes are matched with the support prototypes to form visual prompts, which are fed to the SAM decoder to predict the final query segmentation mask. \cite{park2025fcpsam}}
     }
     
     \label{FCP-SAM-2.png}
@@ -867,7 +870,7 @@ To refine the precise boundary delineation, the authors also proposed a fine-tun
 \centering
 \IfFileExists{PerSAM-1.png}{%
     \includegraphics[width=1\linewidth]{PerSAM-1.png}%
-    \caption{Positive-negative Location Prior.We calculate a location confidence map for the target object in new test image by the appearance of all local parts. Then, we select the location prior as the point prompt for PerSAM and Target-guided Attention (Left) \& Target-semantic Prompting (Right). To inject SAM with target semantics, we explicitly guide the cross-attention layers, and propose additional prompting with high-level cues.}
+    \caption{Positive-negative Location Prior.We calculate a location confidence map for the target object in new test image by the appearance of all local parts. Then, we select the location prior as the point prompt for PerSAM and Target-guided Attention (Left) \& Target-semantic Prompting (Right). To inject SAM with target semantics, we explicitly guide the cross-attention layers, and propose additional prompting with high-level cues. \cite{zhang2024persam} }
 }
 
 \label{fig:PerSAM-1}
@@ -880,7 +883,7 @@ To refine the precise boundary delineation, the authors also proposed a fine-tun
     \includegraphics[width=0.5\linewidth]{PerSAM-2.png}%
     \caption{Personalized Segmentation Examples. PerSAM (Left) can segment personal
 objects in any context with favorable performance, and PerSAM-F (right) further alleviates
-the ambiguity issue by scale-aware fine-tuning.}
+the ambiguity issue by scale-aware fine-tuning. \cite{zhang2024persam}}
 }
 
 \label{fig:PerSAM-2}
@@ -893,7 +896,7 @@ the ambiguity issue by scale-aware fine-tuning.}
     \caption{The Scale-aware Fine-tuning in
 PerSAM-F. To alleviate the scale ambiguity,
 PerSAM-F adopts two learnable weights for
-adaptively aggregating three-scale masks.}
+adaptively aggregating three-scale masks. \cite{zhang2024persam}}
 \label{fig:PerSAM-3}
 \end{figure}
 }
@@ -922,7 +925,7 @@ Instead of relying solely on the raw geometric features extracted by SAM's gener
 \centering
 \IfFileExists{DAPSAM.png}{%
     \includegraphics[width=1\linewidth]{DAPSAM.png}%
-    \caption{The pipeline of the proposed DAPSAM. a generalization framework is designed to fine-tune SAM, with generalized adapters (top right) to obtain robust features and a prompt generation module (bottom) to generate instance-related source domain prototypes for target image segmentation.}
+    \caption{The pipeline of the proposed DAPSAM. a generalization framework is designed to fine-tune SAM, with generalized adapters (top right) to obtain robust features and a prompt generation module (bottom) to generate instance-related source domain prototypes for target image segmentation. \cite{wei2024prompting}}
 }
 
 \label{fig:DAPSAM}
